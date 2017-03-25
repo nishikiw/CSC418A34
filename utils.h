@@ -42,7 +42,7 @@ inline void matMult(double A[4][4], double B[4][4])
  memcpy(B,C,16*sizeof(double));
 }
 
-inline void transpose(double T[4][4])
+inline void matTranspose(double T[4][4])
 {
 	// Get the transpose matrix of T
 	

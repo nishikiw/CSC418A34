@@ -95,7 +95,7 @@ inline void normalTransform(struct point3D *n_orig, struct point3D *n_transforme
 	
 	double T_inv_trans[4][4];
 	memcpy(T_inv_trans, obj->Tinv, 16*sizeof(double));
-	transpose(T_inv_trans);	// Get the transpose matrix of M inverse.
+	matTranspose(T_inv_trans);	// Get the transpose matrix of M inverse.
 	
 	memcpy(n_transformed, n_orig, 4*sizeof(double));
 	matVecMult(T_inv_trans, n_transformed);
