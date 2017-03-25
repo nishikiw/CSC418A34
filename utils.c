@@ -8,6 +8,7 @@
 */
 
 #include "utils.h"
+#include <math.h>
 
 // A useful 4x4 identity matrix which can be used at any point to
 // initialize or reset object transformations
@@ -195,6 +196,57 @@ void planeIntersect(struct object3D *plane, struct ray3D *ray, double *lambda, s
  /////////////////////////////////
  // TO DO: Complete this function.
  /////////////////////////////////
+	
+	// Transfom the ray to object space.
+	struct ray3D *ray_transformed = (struct ray3D *) malloc(sizeof(struct ray3D));
+	rayTransform(ray, ray_transformed, plane);
+	
+	double t = -ray_transformed->p0.pz / ray_transformed->d.pz;
+	
+	// Invalid intersection.
+	if (t < 0 || ray_transformed->d.pz == 0){
+		printf("ERROR: PLANEINTERSECT - invalid intersection.\n");
+		t = -1;
+		memcpy(lambda, &t, sizeof(double));
+		return;
+	}
+	
+	point3D *vectorToAdd = (point3D *) malloc(sizeof(point3D));
+	vectorToAdd->px = t * ray_transformed->d.px;
+	vectorToAdd->py = t * ray_transformed->d.py;
+	vectorToAdd->pz = t * ray_transformed->d.pz;
+	vectorToAdd->pw = 0;
+	
+	memcpy(p, &ray_transformed->p0, 4*sizeof(double));
+	addVectors(vectorToAdd, p);
+	
+	point3D *n_orig = (point3D *) malloc(sizeof(point3D));
+	
+	n_orig->px = 0;
+	n_orig->py = 0;
+	n_orig->pz = 1;
+	n_orig->pw = 0;
+	
+	if (p->px >= -1 && p->px <= 1 && p->py >= -1 && p->py <= 1){
+		memcpy(lambda, &t, sizeof(double));
+		matVecMult(plane->T, p);
+		normalTransform(n_orig, n, plane);
+	}
+	else{
+		// No intersection within the range.
+		t = -1;
+		memcpy(lambda, &t, sizeof(double));
+		return;
+	}
+	
+	// TO DO for part4.
+	if (plane->texImg != NULL){
+		printf("TODO Part4: intersection on texture\n");
+	}
+	
+	free(ray_transformed);
+	free(vectorToAdd);
+	free(n_orig);
 }
 
 void sphereIntersect(struct object3D *sphere, struct ray3D *ray, double *lambda, struct point3D *p, struct point3D *n, double *a, double *b)
@@ -205,6 +257,61 @@ void sphereIntersect(struct object3D *sphere, struct ray3D *ray, double *lambda,
  /////////////////////////////////
  // TO DO: Complete this function.
  /////////////////////////////////
+	// Transfom the ray to object space.
+	struct ray3D *ray_transformed = (struct ray3D *) malloc(sizeof(struct ray3D));
+	rayTransform(ray, ray_transformed, sphere);
+	
+	double t, t1, t2, A, B, C;
+	
+	A = dot(&ray_transformed->d, &ray_transformed->d);
+	B = 2 * dot(&ray_transformed->d, &ray_transformed->p0);
+	C = dot(&ray_transformed->p0, &ray_transformed->p0) - 1;
+	
+	// t2 >= t1
+	t1 = (-B - sqrt(B * B - 4 * A * C))/(2 * A);
+	t2 = (-B + sqrt(B * B - 4 * A * C))/(2 * A);
+	
+	if (t1 < 0){
+		if (t2 < 0){
+			printf("ERROR: SPHEREINTERSECT - invalid intersection.\n");
+			t = -1;
+			memcpy(lambda, &t, sizeof(double));
+			return;
+		}
+		else{
+			t = t2;
+		}
+	}
+	else{
+		t = t1;
+	}
+
+	point3D *vectorToAdd = (point3D *) malloc(sizeof(point3D));
+	vectorToAdd->px = t * ray_transformed->d.px;
+	vectorToAdd->py = t * ray_transformed->d.py;
+	vectorToAdd->pz = t * ray_transformed->d.pz;
+	vectorToAdd->pw = 0;
+	
+	memcpy(p, &ray_transformed->p0, 4*sizeof(double));
+	addVectors(vectorToAdd, p);
+	
+	point3D *n_orig = (point3D *) malloc(sizeof(point3D));
+	
+	memcpy(n_orig, p, sizeof(point3D));
+	n_orig->pw = 0;
+	
+	memcpy(lambda, &t, sizeof(double));
+	matVecMult(sphere->T, p);
+	normalTransform(n_orig, n, sphere);
+	
+	// TO DO for part4.
+	if (sphere->texImg != NULL){
+		printf("TODO Part4: intersection on texture\n");
+	}
+	
+	free(ray_transformed);
+	free(vectorToAdd);
+	free(n_orig);
 }
 
 void loadTexture(struct object3D *o, const char *filename)
