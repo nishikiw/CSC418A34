@@ -211,6 +211,32 @@ void rayTrace(struct ray3D *ray, int depth, struct colourRGB *col, struct object
  // TO DO: Complete this function. Refer to the notes
  // if you are unsure what to do here.
  ///////////////////////////////////////////////////////
+
+ p = newPoint(0, 0, 0);
+ n = newPoint(0, 0, 0);
+
+
+ //find the closest intersection
+ findFirstHit(ray, lambda, obj, Os, p, n, &a, &b);
+ if (lambda < 0) {
+  col->R=-1;
+  col->G=-1;
+  col->B=-1;
+  return;
+ }
+
+ // evaluate shading mode and get the colour
+ rtShade(obj, p, n, ray, depth, a, b, &I);
+
+ 
+
+
+
+
+
+
+
+
 }
 
 int main(int argc, char *argv[])
@@ -287,7 +313,7 @@ int main(int argc, char *argv[])
  //////////////////////////////////////////
 
  // Mind the homogeneous coordinate w of all vectors below. DO NOT
- // forget to set it to 1, or you'll get junk out of the
+ // forget to set it to 1, or you'll rgbImget junk out of the
  // geometric transformations later on.
 
  // Camera center is at (0,0,-1)
@@ -325,9 +351,9 @@ int main(int argc, char *argv[])
  }
 
  // Set up background colour here
- background.R=0;
- background.G=0;
- background.B=0;
+ background.R=0.1
+ background.G=0.1;
+ background.B=0.1;
 
  // Do the raytracing
  //////////////////////////////////////////////////////
@@ -362,6 +388,24 @@ int main(int argc, char *argv[])
     // TO DO - complete the code that should be in this loop to do the
     //         raytracing!
     ///////////////////////////////////////////////////////////////////
+
+    // the coordinates of a pixel in view coordinator
+    pc=newPoint(cam->wl+(i+0.5)*du, cam->wt+(j+0.5)*dv, cam->f);
+    // the direction of a ray in view coordinator
+    d=newPont(pc->px-cam->px, pc->py-cam->py, pc->pz-cam->pz);
+    // convert to world-space
+    pc=matVecMult(cam->C2W, pc);
+    d=matVecMult(cam->C2W, d);
+    //construct viewing ray
+    ray=newRay(pc, d);
+
+    // call rayTrace
+    rayTrace(ray, MAX_DEPTH, col, object_list);
+
+    *(rgbIm + (j*wsize + i*wsize)*3 + 0) = (unsigned char)col->R
+    *(igbIm + (j*wsize + i*wsize)*3 + 1] = (unsigned char)col->G
+    *(rgbIm + (j*wsize + i*wsize)*3 + 2] = (unsigned char)col->B
+
 
   } // end for i
  } // end for j
