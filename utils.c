@@ -70,6 +70,17 @@ inline void rayTransform(struct ray3D *ray_orig, struct ray3D *ray_transformed, 
  ///////////////////////////////////////////
  // TO DO: Complete this function
  ///////////////////////////////////////////
+	
+	// Transform p0.
+	memcpy(&ray_transformed->p0, &ray_orig->p0, 4*sizeof(double));
+	matVecMult(obj->Tinv, &ray_transformed->p0);
+	
+	// Transform d.
+	memcpy(&ray_transformed->d, &ray_orig->d, 4*sizeof(double));
+	matVecMult(obj->Tinv, &ray_transformed->d);
+	
+	// Attach rayPosition function to rayPos
+	ray_transformed->rayPos=&rayPosition;
 }
 
 inline void normalTransform(struct point3D *n_orig, struct point3D *n_transformed, struct object3D *obj)
@@ -81,6 +92,13 @@ inline void normalTransform(struct point3D *n_orig, struct point3D *n_transforme
  ///////////////////////////////////////////
  // TO DO: Complete this function
  ///////////////////////////////////////////
+	
+	double T_inv_trans[4][4];
+	memcpy(T_inv_trans, obj->Tinv, 16*sizeof(double));
+	transpose(T_inv_trans);	// Get the transpose matrix of M inverse.
+	
+	memcpy(n_transformed, n_orig, 4*sizeof(double));
+	matVecMult(T_inv_trans, n_transformed);
 }
 
 /////////////////////////////////////////////

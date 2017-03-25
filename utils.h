@@ -42,6 +42,21 @@ inline void matMult(double A[4][4], double B[4][4])
  memcpy(B,C,16*sizeof(double));
 }
 
+inline void transpose(double T[4][4])
+{
+	// Get the transpose matrix of T
+	
+	double Ttrans[4][4];
+	
+	memset(Ttrans,0,16*sizeof(double));
+	for (int i = 0; i < 4; i++){
+		for (int j = 0; j < 4; j++){
+			Ttrans[i][j] = T[j][i];
+		}
+	}
+	memcpy(T,Ttrans,16*sizeof(double));
+}
+
 inline void matVecMult(double A[4][4], struct point3D *pt)
 {
  // Matrix vector multiplication pt=A*pt, notice that the result
