@@ -197,6 +197,26 @@ void findFirstHit(struct ray3D *ray, double *lambda, struct object3D *Os, struct
  // reference of what to do in here
  /////////////////////////////////////////////////////////////
 
+  double lambda1;    // Lambda at intersection
+  //double a1,b1;    // Texture coordinates
+  struct object3D *obj1;  // Pointer to object at intersection
+  struct point3D p1;  // Intersection point
+  struct point3D n1;  // Normal at intersection
+   
+  if (Os==NULL) {
+    return;
+  } else {
+    Os->intersect(Os, ray, &lambda1, &p1, &n1, a, b);
+    if (lambda1 >= 0 && lambda1 < *lambda) {
+      *lambda = lambda1;
+      *obj = obj1;
+      *p = p1;
+      *n = n1;
+    }
+    Os=Os->next;
+    findFirstHit(ray, lambda, Os, obj, p, n, a, b);
+  }
+  return;
 }
 
 void rayTrace(struct ray3D *ray, int depth, struct colourRGB *col, struct object3D *Os)
@@ -233,13 +253,14 @@ void rayTrace(struct ray3D *ray, int depth, struct colourRGB *col, struct object
  // if you are unsure what to do here.
  ///////////////////////////////////////////////////////
 
- p = newPoint(0, 0, 0);
- n = newPoint(0, 0, 0);
-
+ // &p = (struct point3D *)calloc(1,sizeof(struct point3D));
+ // &n = (struct point3D *)calloc(1,sizeof(struct point3D));
 
  //find the closest intersection
- findFirstHit(ray, lambda, obj, Os, p, n, &a, &b);
- if (lambda < 0) {
+  lambda = -1;
+
+  findFirstHit(ray, &lambda, Os, &obj, &p, &n, &a, &b);
+  if (lambda < 0) {
   col->R=-1;
   col->G=-1;
   col->B=-1;
@@ -247,16 +268,9 @@ void rayTrace(struct ray3D *ray, int depth, struct colourRGB *col, struct object
  }
 
  // evaluate shading mode and get the colour
- rtShade(obj, p, n, ray, depth, a, b, &I);
-
- 
-
-
-
-
-
-
-
+ rtShade(obj, &p, &n, ray, depth, a, b, &I);
+ memcpy(col, &I, 3);
+ return;
 
 }
 
@@ -349,13 +363,16 @@ int main(int argc, char *argv[])
  g.px=0;
  g.py=0;
  g.pz=1;
- g.pw=1;
+ //g.pw=1;
+ g.pw=0;
 
  // Define the 'up' vector to be the Y axis
  up.px=0;
  up.py=1;
  up.pz=0;
- up.pw=1;
+ //up.pw=1;
+ up.pw=0;
+  
 
  // Set up view with given the above vectors, a 4x4 window,
  // and a focal length of -1 (why? where is the image plane?)
@@ -372,7 +389,7 @@ int main(int argc, char *argv[])
  }
 
  // Set up background colour here
- background.R=0.1
+ background.R=0.1;
  background.G=0.1;
  background.B=0.1;
 
@@ -411,22 +428,28 @@ int main(int argc, char *argv[])
     ///////////////////////////////////////////////////////////////////
 
     // the coordinates of a pixel in view coordinator
-    pc=newPoint(cam->wl+(i+0.5)*du, cam->wt+(j+0.5)*dv, cam->f);
+    pc=*newPoint(cam->wl+(i+0.5)*du, cam->wt+(j+0.5)*dv, cam->f);
     // the direction of a ray in view coordinator
-    d=newPont(pc->px-cam->px, pc->py-cam->py, pc->pz-cam->pz);
+    d=*newPoint(pc.px-cam->e.px, pc.py-cam->e.py, pc.pz-cam->e.pz);
     // convert to world-space
-    pc=matVecMult(cam->C2W, pc);
-    d=matVecMult(cam->C2W, d);
+    matVecMult(cam->C2W, &pc);
+    matVecMult(cam->C2W, &d);
     //construct viewing ray
-    ray=newRay(pc, d);
+    ray=newRay(&pc, &d);
 
     // call rayTrace
-    rayTrace(ray, MAX_DEPTH, col, object_list);
+    rayTrace(ray, MAX_DEPTH, &col, object_list);
 
-    *(rgbIm + (j*wsize + i*wsize)*3 + 0) = (unsigned char)col->R
-    *(igbIm + (j*wsize + i*wsize)*3 + 1] = (unsigned char)col->G
-    *(rgbIm + (j*wsize + i*wsize)*3 + 2] = (unsigned char)col->B
-
+    if (col.R < 0) {
+      rgbIm[(int)(j*cam->wsize + i*du)*3] = (unsigned char)background.R;
+      rgbIm[(int)(j*cam->wsize + i*du)*3 + 1] = (unsigned char)background.G;
+      rgbIm[(int)(j*cam->wsize + i*du)*3 + 2] = (unsigned char)background.B;
+    } 
+    else {
+      rgbIm[(int)(j*cam->wsize + i*du)*3] = (unsigned char)col.R;
+      rgbIm[(int)(j*cam->wsize + i*du)*3 + 1] = (unsigned char)col.G;
+      rgbIm[(int)(j*cam->wsize + i*du)*3 + 2] = (unsigned char)col.B;
+    }
 
   } // end for i
  } // end for j
