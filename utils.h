@@ -115,7 +115,7 @@ inline struct point3D *cross(struct point3D *u, struct point3D *v)
  cp->px=(u->py*v->pz)-(v->py*u->pz);
  cp->py=(v->px*u->pz)-(u->px*v->pz);
  cp->pz=(u->px*v->py)-(v->px*u->py);
- cp->pw=1;
+ cp->pw=0;
  return(cp);
 }
 
@@ -127,7 +127,7 @@ inline void addVectors(struct point3D *a, struct point3D *b)
  b->px=b->px+a->px;
  b->py=b->py+a->py;
  b->pz=b->pz+a->pz;
- b->pw=1;               // Mind the homogeneous coordinate!
+ b->pw=b->pw+a->pw;               // Mind the homogeneous coordinate!
 }
 
 inline void subVectors(struct point3D *a, struct point3D *b)
