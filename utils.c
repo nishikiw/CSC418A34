@@ -20,7 +20,7 @@ double eye4x4[4][4]={{1.0, 0.0, 0.0, 0.0},
 /////////////////////////////////////////////
 // Primitive data structure section
 /////////////////////////////////////////////
-struct point3D *newPoint(double px, double py, double pz)
+struct point3D *newPoint(double px, double py, double pz, double pw)
 {
  // Allocate a new point structure, initialize it to
  // the specified coordinates, and return a pointer
@@ -33,7 +33,7 @@ struct point3D *newPoint(double px, double py, double pz)
   pt->px=px;
   pt->py=py;
   pt->pz=pz;
-  pt->pw=1.0;
+  pt->pw=pw;
  }
  return(pt);
 }
@@ -198,7 +198,11 @@ void planeIntersect(struct object3D *plane, struct ray3D *ray, double *lambda, s
  /////////////////////////////////
 	
 	// Transfom the ray to object space.
-	struct ray3D *ray_transformed = (struct ray3D *) malloc(sizeof(struct ray3D));
+	struct Point3D *ray_transformed_p0, *ray_transformed_d;
+	ray_transformed_p0 = newPoint(0.0, 0.0, 0.0, 1.0);
+	ray_transformed_d = newPoint(0.0, 0.0, 0.0, 0.0);
+	struct ray3D *ray_transformed;
+	ray_transformed = newRay(ray_transformed_p0, ray_transformed_d);
 	rayTransform(ray, ray_transformed, plane);
 	
 	double t = -ray_transformed->p0.pz / ray_transformed->d.pz;
@@ -211,21 +215,12 @@ void planeIntersect(struct object3D *plane, struct ray3D *ray, double *lambda, s
 		return;
 	}
 	
-	point3D *vectorToAdd = (point3D *) malloc(sizeof(point3D));
-	vectorToAdd->px = t * ray_transformed->d.px;
-	vectorToAdd->py = t * ray_transformed->d.py;
-	vectorToAdd->pz = t * ray_transformed->d.pz;
-	vectorToAdd->pw = 0;
+	point3D *vectorToAdd = newPoint(t * ray_transformed->d.px, t * ray_transformed->d.py, t * ray_transformed->d.pz, 0);
 	
 	memcpy(p, &ray_transformed->p0, 4*sizeof(double));
 	addVectors(vectorToAdd, p);
 	
-	point3D *n_orig = (point3D *) malloc(sizeof(point3D));
-	
-	n_orig->px = 0;
-	n_orig->py = 0;
-	n_orig->pz = 1;
-	n_orig->pw = 0;
+	point3D *n_orig = newPoint(0, 0, 1, 0);
 	
 	if (p->px >= -1 && p->px <= 1 && p->py >= -1 && p->py <= 1){
 		memcpy(lambda, &t, sizeof(double));
@@ -244,6 +239,8 @@ void planeIntersect(struct object3D *plane, struct ray3D *ray, double *lambda, s
 		printf("TODO Part4: intersection on texture\n");
 	}
 	
+	free(ray_transformed_p0);
+	free(ray_transformed_d);
 	free(ray_transformed);
 	free(vectorToAdd);
 	free(n_orig);
@@ -258,7 +255,9 @@ void sphereIntersect(struct object3D *sphere, struct ray3D *ray, double *lambda,
  // TO DO: Complete this function.
  /////////////////////////////////
 	// Transfom the ray to object space.
-	struct ray3D *ray_transformed = (struct ray3D *) malloc(sizeof(struct ray3D));
+	struct Point3D *ray_transformed_p0 = newPoint(0, 0, 0, 1);
+	struct Point3D *ray_transformed_d = newPoint(0, 0, 0, 0);
+	struct ray3D *ray_transformed = newRay(ray_transformed_p0, ray_transformed_d);
 	rayTransform(ray, ray_transformed, sphere);
 	
 	double t, t1, t2, A, B, C;
@@ -286,19 +285,12 @@ void sphereIntersect(struct object3D *sphere, struct ray3D *ray, double *lambda,
 		t = t1;
 	}
 
-	point3D *vectorToAdd = (point3D *) malloc(sizeof(point3D));
-	vectorToAdd->px = t * ray_transformed->d.px;
-	vectorToAdd->py = t * ray_transformed->d.py;
-	vectorToAdd->pz = t * ray_transformed->d.pz;
-	vectorToAdd->pw = 0;
+	point3D *vectorToAdd = newPoint(t * ray_transformed->d.px, t * ray_transformed->d.py, t * ray_transformed->d.pz, 0);
 	
 	memcpy(p, &ray_transformed->p0, 4*sizeof(double));
 	addVectors(vectorToAdd, p);
 	
-	point3D *n_orig = (point3D *) malloc(sizeof(point3D));
-	
-	memcpy(n_orig, p, sizeof(point3D));
-	n_orig->pw = 0;
+	point3D *n_orig = newPoint(p->px, p->py, p->pz, 0);
 	
 	memcpy(lambda, &t, sizeof(double));
 	matVecMult(sphere->T, p);
@@ -309,6 +301,8 @@ void sphereIntersect(struct object3D *sphere, struct ray3D *ray, double *lambda,
 		printf("TODO Part4: intersection on texture\n");
 	}
 	
+	free(ray_transformed_p0);
+	free(ray_transformed_d);
 	free(ray_transformed);
 	free(vectorToAdd);
 	free(n_orig);

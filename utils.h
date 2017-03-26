@@ -138,7 +138,7 @@ inline void subVectors(struct point3D *a, struct point3D *b)
  b->px=b->px-a->px;
  b->py=b->py-a->py;
  b->pz=b->pz-a->pz;
- b->pw=1;               // Mind the homogeneous coordinate!
+ b->pw=b->pw-a->pw;               // Mind the homogeneous coordinate!
 }
 
 inline double length(struct point3D *a)
@@ -148,7 +148,7 @@ inline double length(struct point3D *a)
 }
 
 // Functions to instantiate primitives
-struct point3D *newPoint(double px, double py, double pz);
+struct point3D *newPoint(double px, double py, double pz, double pw);
 struct pointLS *newPLS(struct point3D *p0, double r, double g, double b);
 
 // Ray management inlines
