@@ -198,7 +198,7 @@ void planeIntersect(struct object3D *plane, struct ray3D *ray, double *lambda, s
  /////////////////////////////////
 	
 	// Transfom the ray to object space.
-	struct Point3D *ray_transformed_p0, *ray_transformed_d;
+	struct point3D *ray_transformed_p0, *ray_transformed_d;
 	ray_transformed_p0 = newPoint(0.0, 0.0, 0.0, 1.0);
 	ray_transformed_d = newPoint(0.0, 0.0, 0.0, 0.0);
 	struct ray3D *ray_transformed;
@@ -255,8 +255,8 @@ void sphereIntersect(struct object3D *sphere, struct ray3D *ray, double *lambda,
  // TO DO: Complete this function.
  /////////////////////////////////
 	// Transfom the ray to object space.
-	struct Point3D *ray_transformed_p0 = newPoint(0, 0, 0, 1);
-	struct Point3D *ray_transformed_d = newPoint(0, 0, 0, 0);
+	struct point3D *ray_transformed_p0 = newPoint(0, 0, 0, 1);
+	struct point3D *ray_transformed_d = newPoint(0, 0, 0, 0);
 	struct ray3D *ray_transformed = newRay(ray_transformed_p0, ray_transformed_d);
 	rayTransform(ray, ray_transformed, sphere);
 	

@@ -156,8 +156,8 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
  // Be sure to update 'col' with the final colour computed here!
  
  struct pointLS *cur_light = light_list;
- struct Point3d *cur_shadow_ray_p0 = p;
- struct Point3d *cur_shadow_ray_d = newPoint(0, 0, 0, 0);
+ struct point3D *cur_shadow_ray_p0 = p;
+ struct point3D *cur_shadow_ray_d = newPoint(0.0, 0.0, 0.0, 0.0);
  struct ray3D *cur_shadow_ray = newRay(cur_shadow_ray_p0, cur_shadow_ray_d);
  struct point3D *first_hit_p = newPoint(0.0, 0.0, 0.0, 1.0);
  struct point3D *first_hit_n = newPoint(0.0, 0.0, 0.0, 0.0); 
@@ -165,11 +165,11 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
  
  if (p != NULL){
   while (cur_light != NULL){
-   struct point3D *d = newPoint(cur_light->p0->px, cur_light->p0->py, cur_light->p0->pz, cur_light->p0->pw);
-   subVectors(cur_shadow_ray->p0, d);
-   memcpy(cur_shadow_ray->d, d, sizeof(struct point3D));
+   struct point3D *d = newPoint(cur_light->p0.px, cur_light->p0.py, cur_light->p0.pz, cur_light->p0.pw);
+   subVectors(&cur_shadow_ray->p0, d);
+   memcpy(&cur_shadow_ray->d, d, sizeof(struct point3D));
    
-   findFirstHit(cur_shadow_ray, lambda, obj, first_hit_p, first_hit_n, &a, &b);
+   findFirstHit(cur_shadow_ray, lambda, obj, &object_list, first_hit_p, first_hit_n, &a, &b);
    
    cur_light = cur_light->next;
   }
@@ -428,9 +428,9 @@ int main(int argc, char *argv[])
     ///////////////////////////////////////////////////////////////////
 
     // the coordinates of a pixel in view coordinator
-    pc=*newPoint(cam->wl+(i+0.5)*du, cam->wt+(j+0.5)*dv, cam->f);
+    pc=*newPoint(cam->wl+(i+0.5)*du, cam->wt+(j+0.5)*dv, cam->f, 1.0);
     // the direction of a ray in view coordinator
-    d=*newPoint(pc.px-cam->e.px, pc.py-cam->e.py, pc.pz-cam->e.pz);
+    d=*newPoint(pc.px-cam->e.px, pc.py-cam->e.py, pc.pz-cam->e.pz, 0.0);
     // convert to world-space
     matVecMult(cam->C2W, &pc);
     matVecMult(cam->C2W, &d);
