@@ -442,7 +442,7 @@ int main(int argc, char *argv[])
     ray=newRay(&pc, &d);
 
     // call rayTrace
-    rayTrace(ray, MAX_DEPTH, &col, object_list);
+    rayTrace(ray, 0, &col, NULL);
 
     if (col.R < 0) {
       rgbIm[(int)(j*cam->wsize + i*du)*3] = (unsigned char)background.R;
