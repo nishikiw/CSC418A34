@@ -174,11 +174,14 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
   while (cur_light != NULL){
    struct point3D *light_ray = newPoint(cur_light->p0.px, cur_light->p0.py, cur_light->p0.pz, cur_light->p0.pw);
    subVectors(&cur_shadow_ray->p0, light_ray);
-   normalize(light_ray);
    memcpy(&cur_shadow_ray->d, light_ray, sizeof(struct point3D));
    *lambda = -1;
    findFirstHit(cur_shadow_ray, lambda, obj, &findFirstHit_obj, first_hit_p, first_hit_n, &a, &b);
-   if (*lambda < 0){
+   if (*lambda > 0 && *lambda < 1){
+	tmp_col.R += findFirstHit_obj->alb.ra * cur_light->col.R;
+	tmp_col.G += findFirstHit_obj->alb.ra * cur_light->col.G;
+	tmp_col.B += findFirstHit_obj->alb.ra * cur_light->col.B;
+   } else {	   
     phongIllumination(cur_light, ray, cur_shadow_ray, findFirstHit_obj, p, n, phong_col);
 	tmp_col.R += phong_col->R;
     tmp_col.G += phong_col->G;
@@ -192,13 +195,13 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
   col->G += tmp_col.G;
   col->B += tmp_col.B;
   
-  if (depth > 0){
+  if (depth < MAX_DEPTH){
    struct point3D *reflect_ray_p0 = p;
    double vn = dot(&ray->d, n);
    struct point3D *reflect_ray_d = newPoint(2*vn*n->px - ray->d.px, 2*vn*n->py - ray->d.py, 2*vn*n->pz - ray->d.pz, 0.0);
    normalize(reflect_ray_d);
    struct ray3D *reflect_ray = newRay(reflect_ray_p0, reflect_ray_d);
-   rayTrace(reflect_ray, --depth, col, findFirstHit_obj);
+   rayTrace(reflect_ray, ++depth, col, findFirstHit_obj);
    free(reflect_ray_d);
    free(reflect_ray);
   }
