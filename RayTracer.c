@@ -295,7 +295,7 @@ void findFirstHit(struct ray3D *ray, double *lambda, struct object3D *Os, struct
     return;
   }
 
-  while (cur_obj!=NULL) {
+  while (cur_obj!=NULL && cur_obj!=Os) {
     cur_obj->intersect(cur_obj, ray, &lambda1, &p1, &n1, a, b);
     if (lambda1 >= 0 && (*lambda == -1 || lambda1 < *lambda)) {
       *lambda = lambda1;
@@ -350,19 +350,30 @@ void rayTrace(struct ray3D *ray, int depth, struct colourRGB *col, struct object
   lambda = -1;
 
   findFirstHit(ray, &lambda, NULL, &obj, &p, &n, &a, &b);
+
   if (lambda < 0) {
   col->R=-1;
   col->G=-1;
   col->B=-1;
   return;
- }
+  }
 
- // evaluate shading mode and get the colour
+  // evaluate shading mode and get the colour
+  if (obj!=Os) {
+    rtShade(obj, &p, &n, ray, depth, a, b, &I);
 
- rtShade(obj, &p, &n, ray, depth, a, b, &I);
- memcpy(col, &I, 3);
- return;
+    if (Os!=NULL) {
+      col->R += Os->alb.rg*I.R;
+      col->G += Os->alb.rg*I.G;
+      col->B += Os->alb.rg*I.B;
+    } else {
+      col->R += I.R;
+      col->G += I.G;
+      col->B += I.B;
+    } 
+  }
 
+  return;
 }
 
 int main(int argc, char *argv[])
@@ -527,6 +538,11 @@ int main(int argc, char *argv[])
     matVecMult(cam->C2W, &d);
     //construct viewing ray
     ray=newRay(&pc, &d);
+
+    // initialize pixel colour
+    col.R=0.0;
+    col.G=0.0;
+    col.B=0.0;
 
     // call rayTrace
     rayTrace(ray, 0, &col, NULL);
