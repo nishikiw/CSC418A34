@@ -404,9 +404,9 @@ int main(int argc, char *argv[])
  }
 
  // Set up background colour here
- background.R=0.1;
- background.G=0.1;
- background.B=0.1;
+ background.R=0.01;
+ background.G=0.01;
+ background.B=0.01;
 
  // Do the raytracing
  //////////////////////////////////////////////////////
