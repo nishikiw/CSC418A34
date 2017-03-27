@@ -161,22 +161,32 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
  struct ray3D *cur_shadow_ray = newRay(cur_shadow_ray_p0, cur_shadow_ray_d);
  struct point3D *first_hit_p = newPoint(0.0, 0.0, 0.0, 1.0);
  struct point3D *first_hit_n = newPoint(0.0, 0.0, 0.0, 0.0); 
- double *lambda = 0;
+ double *lambda;
+ struct object3D **obj;
  
  if (p != NULL){
   while (cur_light != NULL){
    struct point3D *d = newPoint(cur_light->p0.px, cur_light->p0.py, cur_light->p0.pz, cur_light->p0.pw);
    subVectors(&cur_shadow_ray->p0, d);
+   normalize(d);
    memcpy(&cur_shadow_ray->d, d, sizeof(struct point3D));
-   
+   *lambda = -1;
    findFirstHit(cur_shadow_ray, lambda, obj, &object_list, first_hit_p, first_hit_n, &a, &b);
-   
+   if (*lambda < 0){
+    tmp_col += 
+   }
    cur_light = cur_light->next;
+   free(d);
   }
  }
  
  return;
 
+}
+
+void phoneIllumination(struct pointLS *light, struct ray3D *ray)
+{
+	/* Return the */
 }
 
 void findFirstHit(struct ray3D *ray, double *lambda, struct object3D *Os, struct object3D **obj, struct point3D *p, struct point3D *n, double *a, double *b)

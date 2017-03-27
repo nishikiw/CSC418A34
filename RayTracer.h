@@ -150,5 +150,6 @@ void buildScene(void);											// Scene set up. Defines objects and object tra
 void rayTrace(struct ray3D *ray, int depth, struct colourRGB *col, struct object3D *Os);		// RayTracing routine
 void findFirstHit(struct ray3D *ray, double *lambda, struct object3D *Os, struct object3D **obj, struct point3D *p, struct point3D *n, double *a, double *b);
 void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n,struct ray3D *ray, int depth, double a, double b, struct colourRGB *col);
+void phoneIllumination(struct pointLS *light, struct ray3D *ray);
 
 #endif
