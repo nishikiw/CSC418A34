@@ -19,6 +19,7 @@
 */
 
 #include "utils.h"
+#include <math.h>
 
 // A couple of global structures and data: An object list, a light list, and the
 // maximum recursion depth
@@ -155,38 +156,114 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
 
  // Be sure to update 'col' with the final colour computed here!
  
+ tmp_col.R += R;
+ tmp_col.G += G;
+ tmp_col.B += B;
+ 
  struct pointLS *cur_light = light_list;
  struct point3D *cur_shadow_ray_p0 = p;
  struct point3D *cur_shadow_ray_d = newPoint(0.0, 0.0, 0.0, 0.0);
  struct ray3D *cur_shadow_ray = newRay(cur_shadow_ray_p0, cur_shadow_ray_d);
  struct point3D *first_hit_p = newPoint(0.0, 0.0, 0.0, 1.0);
  struct point3D *first_hit_n = newPoint(0.0, 0.0, 0.0, 0.0); 
+ struct colourRGB *phong_col = (struct colourRGB *) malloc(sizeof(struct colourRGB));
  double *lambda;
- struct object3D **obj;
+ struct object3D *findFirstHit_obj;
  
  if (p != NULL){
   while (cur_light != NULL){
-   struct point3D *d = newPoint(cur_light->p0.px, cur_light->p0.py, cur_light->p0.pz, cur_light->p0.pw);
-   subVectors(&cur_shadow_ray->p0, d);
-   normalize(d);
-   memcpy(&cur_shadow_ray->d, d, sizeof(struct point3D));
+   struct point3D *light_ray = newPoint(cur_light->p0.px, cur_light->p0.py, cur_light->p0.pz, cur_light->p0.pw);
+   subVectors(&cur_shadow_ray->p0, light_ray);
+   normalize(light_ray);
+   memcpy(&cur_shadow_ray->d, light_ray, sizeof(struct point3D));
    *lambda = -1;
-   findFirstHit(cur_shadow_ray, lambda, obj, &object_list, first_hit_p, first_hit_n, &a, &b);
+   findFirstHit(cur_shadow_ray, lambda, obj, &findFirstHit_obj, first_hit_p, first_hit_n, &a, &b);
    if (*lambda < 0){
-    tmp_col += 
+    phongIllumination(cur_light, ray, cur_shadow_ray, findFirstHit_obj, p, n, phong_col);
+	tmp_col.R += phong_col->R;
+    tmp_col.G += phong_col->G;
+    tmp_col.B += phong_col->B;
    }
    cur_light = cur_light->next;
-   free(d);
+   free(light_ray);
+  }
+  
+  col->R += tmp_col.R;
+  col->G += tmp_col.G;
+  col->B += tmp_col.B;
+  
+  if (depth > 0){
+   struct point3D *reflect_ray_p0 = p;
+   double vn = dot(&ray->d, n);
+   struct point3D *reflect_ray_d = newPoint(2*vn*n->px - ray->d.px, 2*vn*n->py - ray->d.py, 2*vn*n->pz - ray->d.pz, 0.0);
+   normalize(reflect_ray_d);
+   struct ray3D *reflect_ray = newRay(reflect_ray_p0, reflect_ray_d);
+   rayTrace(reflect_ray, --depth, col, findFirstHit_obj);
+   free(reflect_ray_d);
+   free(reflect_ray);
   }
  }
+ 
+ free(cur_shadow_ray_d);
+ free(cur_shadow_ray);
+ free(first_hit_p);
+ free(first_hit_n);
+ free(phong_col);
  
  return;
 
 }
 
-void phoneIllumination(struct pointLS *light, struct ray3D *ray)
+void phongIllumination(struct pointLS *light, struct ray3D *ray, struct ray3D *light_ray, struct object3D *obj, struct point3D *p, struct point3D *n, struct colourRGB *col)
 {
-	/* Return the */
+	/* Return the phone illumination value col
+	 * light: light source
+	 * ray: ray from view to intersection point
+	 * light_ray: ray from intersection point to light source
+	 * obj: the intersection object
+	 * p: the intersection point
+	 * n: the normal at intersection point
+	 * col: the RETURN colour
+	 */
+	
+	struct point3D *L = newPoint(-light_ray->d.px, -light_ray->d.py, -light_ray->d.pz, 0.0);
+	struct point3D *N = newPoint(n->px, n->py, n->pz, 0.0);
+	struct point3D *V = newPoint(-ray->d.px, -ray->d.py, -ray->d.pz, 0.0);
+	normalize(L);
+	normalize(N);
+	normalize(V);
+	
+	double ln = dot(L, N);
+	
+	struct point3D *R = newPoint(2*ln*N->px - L->px, 2*ln*N->py - L->py, 2*ln*N->pz - L->pz, 0);
+	normalize(R);
+
+	double nl = dot(N, L);
+	if (nl < 0){
+		nl = 0;
+	}
+	
+	double alpha = 1;
+	
+	double vr = pow(dot(V, R), alpha);
+	if (vr < 0){
+		vr = 0;
+	}
+	
+	double ambient = obj->alb.ra;
+	double diffuse = obj->alb.rd * nl;
+	double specular = obj->alb.rs * vr;
+	
+	col->R = (ambient + diffuse + specular) * light->col.R;
+	col->G = (ambient + diffuse + specular) * light->col.G;
+	col->B = (ambient + diffuse + specular) * light->col.B;
+	
+	free(L);
+	free(N);
+	free(V);
+	free(R);
+	
+	return;
 }
 
 void findFirstHit(struct ray3D *ray, double *lambda, struct object3D *Os, struct object3D **obj, struct point3D *p, struct point3D *n, double *a, double *b)
