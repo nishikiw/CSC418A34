@@ -81,14 +81,14 @@ void buildScene(void)
  insertObject(o,&object_list);			// Insert into object list
 
  // Let's add a couple spheres
- o=newSphere(.05,.95,.35,.35,1,.25,.25,1,1,1);
+ o=newSphere(.05,.95,.35,.35,1,.25,.25,1,1,10);
  Scale(o,.75,.5,1.5);
  RotateY(o,PI/2);
  Translate(o,-1.45,1.1,3.5);
  invert(&o->T[0][0],&o->Tinv[0][0]);
  insertObject(o,&object_list);
 
- o=newSphere(.05,.95,.95,.75,.75,.95,.55,1,1,1);
+ o=newSphere(.05,.95,.95,.75,.75,.95,.55,1,1,10);
  Scale(o,.5,2.0,1.0);
  RotateZ(o,PI/1.5);
  Translate(o,1.75,1.25,5.0);
@@ -126,9 +126,7 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
  // Returns:
  // - The colour for this ray (using the col pointer)
  //
- if (depth > 0){
-	 printf("depth = %d\n", depth);
- }
+
  struct colourRGB tmp_col;	// Accumulator for colour components
  double R,G,B;			// Colour for the object in R G and B
 
@@ -175,7 +173,7 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
    memcpy(&cur_shadow_ray->d, light_ray, sizeof(struct point3D));
    lambda = -1;
    findFirstHit(cur_shadow_ray, &lambda, obj, &findFirstHit_obj, first_hit_p, first_hit_n, &a, &b);
-   if (lambda > 0 && lambda < 1){
+   if (lambda > 0 and lambda < 1){
   	tmp_col.R = obj->alb.ra * cur_light->col.R * R;
   	tmp_col.G = obj->alb.ra * cur_light->col.G * G;
   	tmp_col.B = obj->alb.ra * cur_light->col.B * B;
