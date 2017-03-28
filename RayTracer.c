@@ -173,7 +173,7 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
    memcpy(&cur_shadow_ray->d, light_ray, sizeof(struct point3D));
    lambda = -1;
    findFirstHit(cur_shadow_ray, &lambda, obj, &findFirstHit_obj, first_hit_p, first_hit_n, &a, &b);
-   if (lambda > 0 and lambda < 1){
+   if (lambda > 0 && lambda < 1){
   	tmp_col.R = obj->alb.ra * cur_light->col.R * R;
   	tmp_col.G = obj->alb.ra * cur_light->col.G * G;
   	tmp_col.B = obj->alb.ra * cur_light->col.B * B;
