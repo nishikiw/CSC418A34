@@ -220,10 +220,7 @@ void planeIntersect(struct object3D *plane, struct ray3D *ray, double *lambda, s
 		return;
 	}
 	
-	point3D *vectorToAdd = newPoint(t * ray_transformed->d.px, t * ray_transformed->d.py, t * ray_transformed->d.pz, 0);
-	
-	memcpy(p, &ray_transformed->p0, 4*sizeof(double));
-	addVectors(vectorToAdd, p);
+	rayPosition(ray_transformed, t, p);
 	
 	point3D *n_orig = newPoint(0, 0, -1, 0);
 	
@@ -247,7 +244,6 @@ void planeIntersect(struct object3D *plane, struct ray3D *ray, double *lambda, s
 	free(ray_transformed_p0);
 	free(ray_transformed_d);
 	free(ray_transformed);
-	free(vectorToAdd);
 	free(n_orig);
 }
 
@@ -298,10 +294,7 @@ void sphereIntersect(struct object3D *sphere, struct ray3D *ray, double *lambda,
     return;
   }
 
-	point3D *vectorToAdd = newPoint(t * ray_transformed->d.px, t * ray_transformed->d.py, t * ray_transformed->d.pz, 0);
-	
-	memcpy(p, &ray_transformed->p0, 4*sizeof(double));
-	addVectors(vectorToAdd, p);
+	rayPosition(ray_transformed, t, p);
 	
 	point3D *n_orig = newPoint(p->px, p->py, p->pz, 0);
 	
