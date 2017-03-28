@@ -81,14 +81,14 @@ void buildScene(void)
  insertObject(o,&object_list);			// Insert into object list
 
  // Let's add a couple spheres
- o=newSphere(.05,.95,.35,.35,1,.25,.25,1,1,10);
+ o=newSphere(.05,.95,.35,.35,1,.25,.25,1,1,50);
  Scale(o,.75,.5,1.5);
  RotateY(o,PI/2);
  Translate(o,-1.45,1.1,3.5);
  invert(&o->T[0][0],&o->Tinv[0][0]);
  insertObject(o,&object_list);
 
- o=newSphere(.05,.95,.95,.75,.75,.95,.55,1,1,10);
+ o=newSphere(.05,.95,.95,.75,.75,.95,.55,1,1,50);
  Scale(o,.5,2.0,1.0);
  RotateZ(o,PI/1.5);
  Translate(o,1.75,1.25,5.0);
@@ -177,10 +177,6 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
   	tmp_col.R = obj->alb.ra * cur_light->col.R * R;
   	tmp_col.G = obj->alb.ra * cur_light->col.G * G;
   	tmp_col.B = obj->alb.ra * cur_light->col.B * B;
-    printf("lambda: %f\n", lambda);
-    //tmp_col.R = 0;
-    //tmp_col.G = 0;
-    //tmp_col.B = 0;
    } else {
     phongIllumination(cur_light, ray, cur_shadow_ray, obj, p, n, phong_col);
 	  tmp_col.R = R * phong_col->R;
@@ -197,13 +193,15 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
 
   if (depth < MAX_DEPTH){
    struct point3D *reflect_ray_p0 = p;
-   double vn = dot(&ray->d, n);
-   struct point3D *reflect_ray_d = newPoint(2*vn*n->px - ray->d.px, 2*vn*n->py - ray->d.py, 2*vn*n->pz - ray->d.pz, 0.0);
+   struct point3D *reversed_ray_d = newPoint(-ray->d.px, -ray->d.py, -ray->d.pz, 0);
+   double vn = dot(reversed_ray_d, n);
+   struct point3D *reflect_ray_d = newPoint(2*vn*n->px - reversed_ray_d->px, 2*vn*n->py - reversed_ray_d->py, 2*vn*n->pz - reversed_ray_d->pz, 0.0);
    normalize(reflect_ray_d);
    struct ray3D *reflect_ray = newRay(reflect_ray_p0, reflect_ray_d);
    rayTrace(reflect_ray, depth+1, col, obj);
    free(reflect_ray_d);
    free(reflect_ray);
+   free(reversed_ray_d);
   }
  }
 
@@ -292,20 +290,19 @@ void findFirstHit(struct ray3D *ray, double *lambda, struct object3D *Os, struct
     return;
   }
 
-  while (cur_obj!=NULL && cur_obj!=Os) {
-    cur_obj->intersect(cur_obj, ray, &lambda1, &p1, &n1, a, b);
-    if (lambda1 >= 0 && (*lambda == -1 || lambda1 < *lambda)) {
-		if (Os != NULL){
-			printf("lambda 1 = %f\n", lambda1);
+  while (cur_obj!=NULL) {
+	if (cur_obj != Os){
+		cur_obj->intersect(cur_obj, ray, &lambda1, &p1, &n1, a, b);
+		if (lambda1 >= 0 && (*lambda == -1 || lambda1 < *lambda)) {
+		*lambda = lambda1;
+		*obj = cur_obj;
+		*p = p1;
+		*n = n1;
 		}
-      *lambda = lambda1;
-      *obj = cur_obj;
-      *p = p1;
-      *n = n1;
-    }
+	}
     cur_obj=cur_obj->next;
   }
-
+  
   return;
 }
 
@@ -550,9 +547,24 @@ int main(int argc, char *argv[])
       rgbIm[(j*sx + i)*3 + 2] = background.B * 255;
     } 
     else {
-      rgbIm[(j*sx + i)*3] = col.R * 255;
-      rgbIm[(j*sx + i)*3 + 1] = col.G * 255;
-      rgbIm[(j*sx + i)*3 + 2] = col.B * 255;
+	  if (col.R > 1){
+		rgbIm[(j*sx + i)*3] = 255;
+	  }
+	  else{
+		rgbIm[(j*sx + i)*3] = col.R * 255;
+	  }
+	  if (col.G > 1){
+		rgbIm[(j*sx + i)*3+1] = 255;
+	  }
+	  else{
+		rgbIm[(j*sx + i)*3+1] = col.G * 255;
+	  }
+	  if (col.B > 1){
+		rgbIm[(j*sx + i)*3+2] = 255;
+	  }
+	  else{
+		rgbIm[(j*sx + i)*3+2] = col.B * 255;
+	  }
     }
   } // end for i
  } // end for j

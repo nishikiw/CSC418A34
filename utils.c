@@ -222,7 +222,18 @@ void planeIntersect(struct object3D *plane, struct ray3D *ray, double *lambda, s
 	
 	rayPosition(ray_transformed, t, p);
 	
-	point3D *n_orig = newPoint(0, 0, -1, 0);
+	point3D *n_orig;
+	if (plane->frontAndBack == 1){
+		if (ray_transformed->p0.pz < 0){
+			n_orig = newPoint(0, 0, -1, 0);
+		}
+		else{
+			n_orig = newPoint(0, 0, 1, 0);
+		}
+	}
+	else{
+		n_orig = newPoint(0, 0, 1, 0);
+	}
 	
 	if (p->px >= -1 && p->px <= 1 && p->py >= -1 && p->py <= 1){
 		memcpy(lambda, &t, sizeof(double));
