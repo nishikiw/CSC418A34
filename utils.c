@@ -84,6 +84,11 @@ inline void rayTransform(struct ray3D *ray_orig, struct ray3D *ray_transformed, 
 	ray_transformed->rayPos=&rayPosition;
 }
 
+
+void printPoint3D(struct point3D * p){
+  printf("(%f, %f, %f, %f)\n", p->px, p->py, p->pz, p->pw);
+}
+
 inline void normalTransform(struct point3D *n_orig, struct point3D *n_transformed, struct object3D *obj)
 {
  // Computes the normal at an affinely transformed point given the original normal and the
@@ -209,7 +214,7 @@ void planeIntersect(struct object3D *plane, struct ray3D *ray, double *lambda, s
 	
 	// Invalid intersection.
 	if (t < 0 || ray_transformed->d.pz == 0){
-		printf("ERROR: PLANEINTERSECT - invalid intersection.\n");
+		//printf("ERROR: PLANEINTERSECT - invalid intersection.\n");
 		t = -1;
 		memcpy(lambda, &t, sizeof(double));
 		return;
@@ -220,7 +225,7 @@ void planeIntersect(struct object3D *plane, struct ray3D *ray, double *lambda, s
 	memcpy(p, &ray_transformed->p0, 4*sizeof(double));
 	addVectors(vectorToAdd, p);
 	
-	point3D *n_orig = newPoint(0, 0, 1, 0);
+	point3D *n_orig = newPoint(0, 0, -1, 0);
 	
 	if (p->px >= -1 && p->px <= 1 && p->py >= -1 && p->py <= 1){
 		memcpy(lambda, &t, sizeof(double));
@@ -272,7 +277,7 @@ void sphereIntersect(struct object3D *sphere, struct ray3D *ray, double *lambda,
 	
 	if (t1 < 0){
 		if (t2 < 0){
-			printf("ERROR: SPHEREINTERSECT - invalid intersection.\n");
+			//printf("ERROR: SPHEREINTERSECT - invalid intersection.\n");
 			t = -1;
 			memcpy(lambda, &t, sizeof(double));
 			return;
@@ -284,6 +289,14 @@ void sphereIntersect(struct object3D *sphere, struct ray3D *ray, double *lambda,
 	else{
 		t = t1;
 	}
+
+  // Invalid intersection.
+  if (t < 0 || A == 0 || B * B - 4 * A * C < 0){
+    //printf("ERROR: SPHEREINTERSECT - invalid intersection.\n");
+    t = -1;
+    memcpy(lambda, &t, sizeof(double));
+    return;
+  }
 
 	point3D *vectorToAdd = newPoint(t * ray_transformed->d.px, t * ray_transformed->d.py, t * ray_transformed->d.pz, 0);
 	

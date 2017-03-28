@@ -78,6 +78,7 @@ void RotateZ(struct object3D *o, double theta);	// Rotate theta radians CCW arou
 void Translate(struct object3D *o, double tx, double ty, double tz);	// 3D translation
 void Scale(struct object3D *o, double sx, double sy, double sz);	// Non-uniform scaling
 void printmatrix(double mat[4][4]);
+void printPoint3D(struct point3D * p);
 
 // Vector management
 inline void normalize(struct point3D *v)

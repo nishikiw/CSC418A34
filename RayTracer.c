@@ -81,14 +81,14 @@ void buildScene(void)
  insertObject(o,&object_list);			// Insert into object list
 
  // Let's add a couple spheres
- o=newSphere(.05,.95,.35,.35,1,.25,.25,1,1,6);
+ o=newSphere(.05,.95,.35,.35,1,.25,.25,1,1,1);
  Scale(o,.75,.5,1.5);
  RotateY(o,PI/2);
  Translate(o,-1.45,1.1,3.5);
  invert(&o->T[0][0],&o->Tinv[0][0]);
  insertObject(o,&object_list);
 
- o=newSphere(.05,.95,.95,.75,.75,.95,.55,1,1,6);
+ o=newSphere(.05,.95,.95,.75,.75,.95,.55,1,1,1);
  Scale(o,.5,2.0,1.0);
  RotateZ(o,PI/1.5);
  Translate(o,1.75,1.25,5.0);
@@ -155,11 +155,7 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
  //////////////////////////////////////////////////////////////
 
  // Be sure to update 'col' with the final colour computed here!
- 
- tmp_col.R += R;
- tmp_col.G += G;
- tmp_col.B += B;
- 
+
  struct pointLS *cur_light = light_list;
  struct point3D *cur_shadow_ray_p0 = p;
  struct point3D *cur_shadow_ray_d = newPoint(0.0, 0.0, 0.0, 0.0);
@@ -167,46 +163,51 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
  struct point3D *first_hit_p = newPoint(0.0, 0.0, 0.0, 1.0);
  struct point3D *first_hit_n = newPoint(0.0, 0.0, 0.0, 0.0); 
  struct colourRGB *phong_col = (struct colourRGB *) malloc(sizeof(struct colourRGB));
- double *lambda;
+ double lambda;
  struct object3D *findFirstHit_obj;
- 
+
  if (p != NULL){
   while (cur_light != NULL){
    struct point3D *light_ray = newPoint(cur_light->p0.px, cur_light->p0.py, cur_light->p0.pz, cur_light->p0.pw);
    subVectors(&cur_shadow_ray->p0, light_ray);
+   normalize(light_ray);
    memcpy(&cur_shadow_ray->d, light_ray, sizeof(struct point3D));
-   *lambda = -1;
-   findFirstHit(cur_shadow_ray, lambda, obj, &findFirstHit_obj, first_hit_p, first_hit_n, &a, &b);
-   if (*lambda > 0 && *lambda < 1){
-	tmp_col.R += findFirstHit_obj->alb.ra * cur_light->col.R;
-	tmp_col.G += findFirstHit_obj->alb.ra * cur_light->col.G;
-	tmp_col.B += findFirstHit_obj->alb.ra * cur_light->col.B;
-   } else {	   
-    phongIllumination(cur_light, ray, cur_shadow_ray, findFirstHit_obj, p, n, phong_col);
-	tmp_col.R += phong_col->R;
-    tmp_col.G += phong_col->G;
-    tmp_col.B += phong_col->B;
+   lambda = -1;
+   findFirstHit(cur_shadow_ray, &lambda, obj, &findFirstHit_obj, first_hit_p, first_hit_n, &a, &b);
+   if (lambda > 0){
+  	//tmp_col.R = obj->alb.ra * cur_light->col.R * R;
+  	//tmp_col.G = obj->alb.ra * cur_light->col.G * G;
+  	//tmp_col.B = obj->alb.ra * cur_light->col.B * B;
+    printf("lambda: %f\n", lambda);
+    tmp_col.R = 0;
+    tmp_col.G = 0;
+    tmp_col.B = 0;
+   } else {
+    phongIllumination(cur_light, ray, cur_shadow_ray, obj, p, n, phong_col);
+	  tmp_col.R = R * phong_col->R;
+    tmp_col.G = G * phong_col->G;
+    tmp_col.B = B * phong_col->B;
    }
    cur_light = cur_light->next;
    free(light_ray);
   }
   
-  col->R += tmp_col.R;
-  col->G += tmp_col.G;
-  col->B += tmp_col.B;
-  
+  col->R = tmp_col.R;
+  col->G = tmp_col.G;
+  col->B = tmp_col.B;
+
   if (depth < MAX_DEPTH){
    struct point3D *reflect_ray_p0 = p;
    double vn = dot(&ray->d, n);
    struct point3D *reflect_ray_d = newPoint(2*vn*n->px - ray->d.px, 2*vn*n->py - ray->d.py, 2*vn*n->pz - ray->d.pz, 0.0);
    normalize(reflect_ray_d);
    struct ray3D *reflect_ray = newRay(reflect_ray_p0, reflect_ray_d);
-   rayTrace(reflect_ray, ++depth, col, findFirstHit_obj);
+   rayTrace(reflect_ray, depth+1, col, obj);
    free(reflect_ray_d);
    free(reflect_ray);
   }
  }
- 
+
  free(cur_shadow_ray_d);
  free(cur_shadow_ray);
  free(first_hit_p);
@@ -229,7 +230,7 @@ void phongIllumination(struct pointLS *light, struct ray3D *ray, struct ray3D *l
 	 * col: the RETURN colour
 	 */
 	
-	struct point3D *L = newPoint(-light_ray->d.px, -light_ray->d.py, -light_ray->d.pz, 0.0);
+	struct point3D *L = newPoint(light_ray->d.px, light_ray->d.py, light_ray->d.pz, 0.0);
 	struct point3D *N = newPoint(n->px, n->py, n->pz, 0.0);
 	struct point3D *V = newPoint(-ray->d.px, -ray->d.py, -ray->d.pz, 0.0);
 	normalize(L);
@@ -245,27 +246,22 @@ void phongIllumination(struct pointLS *light, struct ray3D *ray, struct ray3D *l
 	if (nl < 0){
 		nl = 0;
 	}
-	
-	double alpha = 1;
+	double alpha = 100;
 	
 	double vr = pow(dot(V, R), alpha);
 	if (vr < 0){
 		vr = 0;
 	}
-	
 	double ambient = obj->alb.ra;
 	double diffuse = obj->alb.rd * nl;
 	double specular = obj->alb.rs * vr;
-	
 	col->R = (ambient + diffuse + specular) * light->col.R;
 	col->G = (ambient + diffuse + specular) * light->col.G;
 	col->B = (ambient + diffuse + specular) * light->col.B;
-	
 	free(L);
 	free(N);
 	free(V);
 	free(R);
-	
 	return;
 }
 
@@ -335,6 +331,7 @@ void rayTrace(struct ray3D *ray, int depth, struct colourRGB *col, struct object
 
  if (depth>MAX_DEPTH)	// Max recursion depth reached. Return invalid colour.
  {
+  printf("HERE\n");
   col->R=-1;
   col->G=-1;
   col->B=-1;
@@ -355,10 +352,7 @@ void rayTrace(struct ray3D *ray, int depth, struct colourRGB *col, struct object
   findFirstHit(ray, &lambda, NULL, &obj, &p, &n, &a, &b);
 
   if (lambda < 0) {
-  col->R=-1;
-  col->G=-1;
-  col->B=-1;
-  return;
+    return;
   }
 
   // evaluate shading mode and get the colour
@@ -540,7 +534,7 @@ int main(int argc, char *argv[])
     matVecMult(cam->C2W, &pc);
     matVecMult(cam->C2W, &d);
     //construct viewing ray
-    ray=newRay(&pc, &d);
+    ray=newRay(&e, &d);
 
     // initialize pixel colour
     col.R=0.0;
@@ -551,16 +545,15 @@ int main(int argc, char *argv[])
     rayTrace(ray, 0, &col, NULL);
 
     if (col.R < 0) {
-      rgbIm[(int)(j*cam->wsize + i*du)*3] = (unsigned char)background.R;
-      rgbIm[(int)(j*cam->wsize + i*du)*3 + 1] = (unsigned char)background.G;
-      rgbIm[(int)(j*cam->wsize + i*du)*3 + 2] = (unsigned char)background.B;
+      rgbIm[(j*sx + i)*3] = background.R * 255;
+      rgbIm[(j*sx + i)*3 + 1] = background.G * 255;
+      rgbIm[(j*sx + i)*3 + 2] = background.B * 255;
     } 
     else {
-      rgbIm[(int)(j*cam->wsize + i*du)*3] = (unsigned char)col.R;
-      rgbIm[(int)(j*cam->wsize + i*du)*3 + 1] = (unsigned char)col.G;
-      rgbIm[(int)(j*cam->wsize + i*du)*3 + 2] = (unsigned char)col.B;
+      rgbIm[(j*sx + i)*3] = col.R * 255;
+      rgbIm[(j*sx + i)*3 + 1] = col.G * 255;
+      rgbIm[(j*sx + i)*3 + 2] = col.B * 255;
     }
-
   } // end for i
  } // end for j
 
