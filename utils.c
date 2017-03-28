@@ -310,7 +310,6 @@ void sphereIntersect(struct object3D *sphere, struct ray3D *ray, double *lambda,
 	free(ray_transformed_p0);
 	free(ray_transformed_d);
 	free(ray_transformed);
-	free(vectorToAdd);
 	free(n_orig);
 }
 

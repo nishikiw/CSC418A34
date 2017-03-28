@@ -126,7 +126,9 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
  // Returns:
  // - The colour for this ray (using the col pointer)
  //
-
+ if (depth > 0){
+	 printf("depth = %d\n", depth);
+ }
  struct colourRGB tmp_col;	// Accumulator for colour components
  double R,G,B;			// Colour for the object in R G and B
 
@@ -174,13 +176,13 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
    lambda = -1;
    findFirstHit(cur_shadow_ray, &lambda, obj, &findFirstHit_obj, first_hit_p, first_hit_n, &a, &b);
    if (lambda > 0 && lambda < 1){
-  	//tmp_col.R = obj->alb.ra * cur_light->col.R * R;
-  	//tmp_col.G = obj->alb.ra * cur_light->col.G * G;
-  	//tmp_col.B = obj->alb.ra * cur_light->col.B * B;
+  	tmp_col.R = obj->alb.ra * cur_light->col.R * R;
+  	tmp_col.G = obj->alb.ra * cur_light->col.G * G;
+  	tmp_col.B = obj->alb.ra * cur_light->col.B * B;
     printf("lambda: %f\n", lambda);
-    tmp_col.R = 0;
-    tmp_col.G = 0;
-    tmp_col.B = 0;
+    //tmp_col.R = 0;
+    //tmp_col.G = 0;
+    //tmp_col.B = 0;
    } else {
     phongIllumination(cur_light, ray, cur_shadow_ray, obj, p, n, phong_col);
 	  tmp_col.R = R * phong_col->R;
@@ -296,6 +298,9 @@ void findFirstHit(struct ray3D *ray, double *lambda, struct object3D *Os, struct
   while (cur_obj!=NULL && cur_obj!=Os) {
     cur_obj->intersect(cur_obj, ray, &lambda1, &p1, &n1, a, b);
     if (lambda1 >= 0 && (*lambda == -1 || lambda1 < *lambda)) {
+		if (Os != NULL){
+			printf("lambda 1 = %f\n", lambda1);
+		}
       *lambda = lambda1;
       *obj = cur_obj;
       *p = p1;
@@ -330,7 +335,6 @@ void rayTrace(struct ray3D *ray, int depth, struct colourRGB *col, struct object
 
  if (depth>MAX_DEPTH)	// Max recursion depth reached. Return invalid colour.
  {
-  printf("HERE\n");
   col->R=-1;
   col->G=-1;
   col->B=-1;
