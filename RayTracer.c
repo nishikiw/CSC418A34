@@ -247,9 +247,8 @@ void phongIllumination(struct pointLS *light, struct ray3D *ray, struct ray3D *l
 	if (nl < 0){
 		nl = 0;
 	}
-	double alpha = 100;
 	
-	double vr = pow(dot(V, R), alpha);
+	double vr = pow(dot(V, R), obj->shinyness);
 	if (vr < 0){
 		vr = 0;
 	}
