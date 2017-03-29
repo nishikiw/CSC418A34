@@ -71,6 +71,10 @@ void buildScene(void)
 						// Colour is close to cyan, and currently the plane is
 						// completely opaque (alpha=1). The refraction index is
 						// meaningless since alpha=1
+ // for scene signature
+ // o=newPlane(1.0, 0.0, 0.0, 0.0,.55,.8,.75,1,1,2);
+ // for diffuse and ambient
+ // o=newPlane(.05,.75, 0.0, 0.0,.55,.8,.75,1,1,2);
  Scale(o,6,6,1);				// Do a few transforms...
  RotateZ(o,PI/1.20);
  RotateX(o,PI/2.25);
@@ -82,6 +86,10 @@ void buildScene(void)
 
  // Let's add a couple spheres
  o=newSphere(.05,.95,.35,.35,1,.25,.25,1,1,50);
+ // for scene signature
+ // o=newSphere(1.0, 0.0, 0.0, 0.0,1,.25,.25,1,1,50);
+ // for diffuse and ambient
+ // o=newSphere(.05,.95, 0.0, 0.0,1,.25,.25,1,1,50);
  Scale(o,.75,.5,1.5);
  RotateY(o,PI/2);
  Translate(o,-1.45,1.1,3.5);
@@ -89,6 +97,10 @@ void buildScene(void)
  insertObject(o,&object_list);
 
  o=newSphere(.05,.95,.95,.75,.75,.95,.55,1,1,50);
+ // for signature
+ // o=newSphere(1.0, 0.0, 0.0, 0.0,.75,.95,.55,1,1,50);
+ // for ambient and signature
+ // o=newSphere(.05,.95, 0.0, 0.0,.75,.95,.55,1,1,50);
  Scale(o,.5,2.0,1.0);
  RotateZ(o,PI/1.5);
  Translate(o,1.75,1.25,5.0);
