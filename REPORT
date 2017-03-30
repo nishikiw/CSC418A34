@@ -25,9 +25,13 @@
 
 - Whether the assignment helped you understand better the following topics:
   - Geometry (points, vectors, planes, spheres, intersections, normals, etc.)
+	YES.
   - Object transformations
+	YES.
   - Projection and coordinate frames
+	YES.
   - Illumination (the Phong model, basically)
+	YES.
   
 - The role of each member on the project:
 Yijin Wang: Implementation of all the functions in utils.c, and function rtShade and 
