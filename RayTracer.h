@@ -141,7 +141,7 @@ struct view{
 	double wt;		// Top edge in camera coordinates
 	double wsize;		// Window size in distance units (not pixels!)
 	double W2C[4][4];	// World2Camera conversion matrix
-	double C2W[4][4];	// Camera2World conversion matrix
+	double C2W[4][4];	// Camera2World conversion matrix 
 };
 
 // Function definitions start here

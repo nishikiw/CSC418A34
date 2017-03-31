@@ -543,7 +543,7 @@ int main(int argc, char *argv[])
     matVecMult(cam->C2W, &pc);
     matVecMult(cam->C2W, &d);
     //construct viewing ray
-    ray=newRay(&e, &d);
+    ray=newRay(&pc, &d);
 
     // initialize pixel colour
     col.R=0.0;

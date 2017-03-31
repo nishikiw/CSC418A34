@@ -5,23 +5,24 @@
   what structs and functions we have for this assignment so that we know what functions to use and 
   what needs to be implemented. Then, we read through the c files (RayTracer.c and utils.c) to know 
   about the structure of the code. Then we split the work and starts implementating the solution, 
-  discussing the confusing parts and debugging altogether.
+  discussing the confusing parts, code reviewing for each other, and debugging altogether. 
   
 - Brief description of the code you implemented and how it works. Particularly if you did anything 
   that is not straightforward to understand by looking at your code.
   
   Function rayTransform, normalTransform, planeIntersect, rtShade, and sphereIntersect were 
   implemented based on the idea or pseudocode learned in lecture and tutorial. Function 
-  phongIllumination were implemented based on the phong illumination formula and was used in rtShade.
+  phongIllumination were implemented based on the phong illumination formula and was used in rtShade. Ray casting is implemented in main function based on the idea and pseudocode learned in lecture, tutorial, and course notes, and function rayTrace, and function findFirstHit are implemented in the samilar way.
 
 - What parts of the assignment were easy/hard.
 
   The idea of the assignment is very clear and easy to understand. However, it took us a long time
   to figure out the value of the colour which is assigned to the final image. Originally, we thought
   the RGB values of colour are in range [0, 1], like what we've seen everywhere else in the code. So 
-  we straghtly assigned the RGB value to output without multiplying by 255. The final image was always
+  we straightly assigned the RGB value to output without multiplying by 255. The final image was always
   black. After debugging for a long time, we realized that the output pointer is unsigned char which
   could not store floats. Then we converted the RGB values from range [0, 1] to range [0, 255].
+  Another tricky part is in function findFirstHit, when we recursively call findFirstHit or rayTrace, the second ray starting from the object may get intersection with itself. So every time when we recursiely call findFirstHit, we need to carefully check the Os the object from which the ray generated and the obj object with which the ray intersects. 
 
 - Whether the assignment helped you understand better the following topics:
   - Geometry (points, vectors, planes, spheres, intersections, normals, etc.)
