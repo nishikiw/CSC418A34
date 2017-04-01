@@ -186,14 +186,14 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
    lambda = -1;
    findFirstHit(cur_shadow_ray, &lambda, obj, &findFirstHit_obj, first_hit_p, first_hit_n, &a, &b);
    if (lambda > 0 && lambda < 1){
-  	tmp_col.R = obj->alb.ra * cur_light->col.R * R;
-  	tmp_col.G = obj->alb.ra * cur_light->col.G * G;
-  	tmp_col.B = obj->alb.ra * cur_light->col.B * B;
+  	tmp_col.R += obj->alb.ra * cur_light->col.R * R;
+  	tmp_col.G += obj->alb.ra * cur_light->col.G * G;
+  	tmp_col.B += obj->alb.ra * cur_light->col.B * B;
    } else {
     phongIllumination(cur_light, ray, cur_shadow_ray, obj, p, n, phong_col);
-	  tmp_col.R = R * phong_col->R;
-    tmp_col.G = G * phong_col->G;
-    tmp_col.B = B * phong_col->B;
+	  tmp_col.R += R * phong_col->R;
+    tmp_col.G += G * phong_col->G;
+    tmp_col.B += B * phong_col->B;
    }
    cur_light = cur_light->next;
    free(light_ray);
@@ -341,9 +341,9 @@ void rayTrace(struct ray3D *ray, int depth, struct colourRGB *col, struct object
 
  if (depth>MAX_DEPTH)	// Max recursion depth reached. Return invalid colour.
  {
-  col->R=-1;
-  col->G=-1;
-  col->B=-1;
+  // col->R=-1;
+  // col->G=-1;
+  // col->B=-1;
   return;
  }
 
@@ -553,7 +553,7 @@ int main(int argc, char *argv[])
     // call rayTrace
     rayTrace(ray, 0, &col, NULL);
 
-    if (col.R < 0) {
+    if (col.R <= 0) {
       rgbIm[(j*sx + i)*3] = background.R * 255;
       rgbIm[(j*sx + i)*3 + 1] = background.G * 255;
       rgbIm[(j*sx + i)*3 + 2] = background.B * 255;
