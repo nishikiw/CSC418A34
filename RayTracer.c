@@ -119,13 +119,13 @@ void buildScene(void)
  // p.px=1;
  // p.py=15.5;
  // p.pz=-5.5;
- // p.pw=1;
+ // p.pw=1;dd
  // l=newPLS(&p,.95/2,.95/2,.95/2);
  // insertPLS(l,&light_list);
 
   // add an area light source
-  addAreaLight(1.0, 1.0, 0.0, 1.0, 0.0,\
-                  0.0, 15.5, -5.5, 2, 2,\
+  addAreaLight(2, 2, 0.0, 1.0, 0.0,\
+                  0.5, 15.5, -5.5, 7, 7,\
                   0.95, 0.95, 0.95, &object_list, &light_list);
 
 
@@ -562,6 +562,7 @@ int main(int argc, char *argv[])
 
     // call rayTrace
     rayTrace(ray, 0, &col, NULL);
+    free(ray);
 
     if (col.R <= 0) {
       rgbIm[(j*sx + i)*3] = background.R * 255;

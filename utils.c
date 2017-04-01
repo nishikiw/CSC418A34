@@ -426,23 +426,32 @@ void addAreaLight(float sx, float sy, float nx, float ny, float nz,\
   struct point3D up;    // up vector
   struct point3D n;     // normal vector
   struct point3D *u, *v;    // u v n form area light source coordinates
-  double W2A[4][4];	// World2Area conversion matrix
+//  double W2A[4][4];	// World2Area conversion matrix
 	double A2W[4][4];	// Area2World conversion matrix 
 	struct object3D *o; // the rectanglar area light source object
 	struct pointLS *l;
 	struct point3D p;
 	int i, j;
 
-  // Define the 'up' vector to be the Y axis
-  up.px=1;
-	up.py=0;
-	up.pz=0;
-	up.pw=0;
 	// obtain normal vector from input
 	n.px=nx;
 	n.py=ny;
 	n.pz=nz;
 	n.pw=0;
+
+  // Define the 'up' vector to be not in the same direction as normal vector
+  if (n.px == 0){
+    up.px = 1;
+    up.py = 0;
+    up.pz = 0;
+  }
+  else{
+    up.px = 0;
+    up.py = 1;
+    up.pz = 0;
+  }
+  up.pw=0;
+
 	normalize(&n);
 	// set up u and v
 	u=cross(&n, &up);
@@ -472,13 +481,13 @@ void addAreaLight(float sx, float sy, float nx, float ny, float nz,\
 	A2W[2][3]=tz;
 	A2W[3][3]=1;
 
-	invert(&A2W[0][0], &W2A[0][0]);
+	//invert(&A2W[0][0], &W2A[0][0]);
 
-  o=newPlane(0, 0, 0, 0, 1.0, 1.0, 1.0, 1, 1, 2);
-	memcpy(&o->T[0][0], &A2W[0][0], 16*sizeof(double));
-	Scale(o, sx/2, sy/2, 1);
+  o=newPlane(0.05, 0, 0, 0, 0.0, 0.0, 1.0, 1, 1, 2);
+  Scale(o, sx/2, sy/2, 1);
+  matMult(A2W, o->T);
 	invert(&o->T[0][0],&o->Tinv[0][0]);
-	//insertObject(o, o_list);			// Insert into object list
+	insertObject(o, o_list);			// Insert into object list
 
   double du, dv;	// Increase along u and v directions for point light source coordinates
   if (lx==1 && ly==1) {
@@ -486,77 +495,69 @@ void addAreaLight(float sx, float sy, float nx, float ny, float nz,\
     p.py = 0;
     p.pz = 0;
     p.pw = 1;
-    matVecMult(A2W, &p);
-    //l = newPLS(&p, r/(lx*ly), g/(lx*ly), b/(lx*ly));
-    l = newPLS(&p, r, g, b);
+    matVecMult(o->T, &p);
+    l = newPLS(&p, r/(lx*ly), g/(lx*ly), b/(lx*ly));
+    //l = newPLS(&p, r, g, b);
     insertPLS(l, l_list);
     free(u);
     free(v);
-    free(o);
-    free(l);
     return;
   }
 
   if (lx>1 && ly==1) {
-    du=sy/(lx-1);
+    du=2.0/(lx-1);
     for (i=0; i<lx; i++) {
-      p.px = -sx/2 + i*du;
+      p.px = -1 + i*du;
       p.py = 0;
       p.pz = 0;
       p.pw = 1;
-      matVecMult(A2W, &p);
-      //l = newPLS(&p, r/(lx*ly), g/(lx*ly), b/(lx*ly));
-      l = newPLS(&p, r, g, b);
+      matVecMult(o->T, &p);
+      l = newPLS(&p, r/(lx*ly), g/(lx*ly), b/(lx*ly));
+      //l = newPLS(&p, r, g, b);
       insertPLS(l, l_list);
     }
     free(u);
     free(v);
-    free(o);
-    free(l);
     return;
   }
 
   if (lx==1 && ly>1) {
-    dv=sy/(ly-1);
+    dv=2.0/(ly-1);
     for (j=0; j<ly; j++) {
       p.px = 0;
-      p.py = -sy/2 + j*dv;
+      p.py = -1 + j*dv;
       p.pz = 0;
       p.pw = 1;
-      matVecMult(A2W, &p);
-      //l = newPLS(&p, r/(lx*ly), g/(lx*ly), b/(lx*ly));
-      l = newPLS(&p, r, g, b);
+      matVecMult(o->T, &p);
+      l = newPLS(&p, r/(lx*ly), g/(lx*ly), b/(lx*ly));
+      //l = newPLS(&p, r, g, b);
       insertPLS(l, l_list);
     }
     free(u);
     free(v);
-    free(o);
-    free(l);
     return;
   }
 
   if (lx>1 && ly>1) {
-    du=sx/(lx-1);   
-    dv=sy/(ly-1);
+    du=2.0/(lx-1);   
+    dv=2.0/(ly-1);
     for (j=0; j<ly; j++) {
       for (i=0; i<lx; i++) {
-        p.px = -sx/2 + i*du;
-        p.py = -sy/2 + j*dv;
+        p.px = -1 + i*du;
+        p.py = -1 + j*dv;
         p.pz = 0;
         p.pw = 1;
-        matVecMult(A2W, &p);
-        //l = newPLS(&p, r/(lx*ly), g/(lx*ly), b/(lx*ly));
-        l = newPLS(&p, r, g, b);
+        matVecMult(o->T, &p);
+
+        l = newPLS(&p, r/(lx*ly), g/(lx*ly), b/(lx*ly));
+        //l = newPLS(&p, r, g, b);
         insertPLS(l, l_list);
       }
     }
+    free(u);
+    free(v);
+    return;
   }
-  free(u);
-  free(v);
-  free(o);
-  free(l);
-
-  return;
 }
 
 ///////////////////////////////////
