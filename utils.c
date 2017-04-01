@@ -423,7 +423,84 @@ void addAreaLight(float sx, float sy, float nx, float ny, float nz,\
   // TO DO: (Assignment 4!)
   // Implement this function to enable area light sources
   /////////////////////////////////////////////////////
+    struct point3D up;    // up vector
+    struct point3D n;     // normal vector
+    struct point3D *u, *v;    // u v n form area light source coordinates
+    double W2A[4][4];	// World2Area conversion matrix
+	double A2W[4][4];	// Area2World conversion matrix 
+	struct object3D *o; // the rectanglar area light source object
+	struct pointLS *l;
+	struct point3D p;
+	int i, j;
 
+    // Define the 'up' vector to be the Y axis
+    up.px=0;
+	up.py=1;
+	up.pz=0;
+	up.pw=0;
+	// obtain normal vector from input
+	n.px=nx;
+	n.py=ny;
+	n.pz=nz;
+	n.pw=0;
+	normalize(&n);
+	// set up u and v
+	u=cross(&n, &up);
+	normalize(u);
+	v=cross(u, &n);
+	normalize(v);
+
+	// Set up coordinate conversion matrices
+	// Area2World matrix
+	A2W[0][0]=u->px;
+	A2W[1][0]=u->py;
+	A2W[2][0]=u->pz;
+	A2W[3][0]=0;
+
+	A2W[0][1]=v->px;
+	A2W[1][1]=v->py;
+	A2W[2][1]=v->pz;
+	A2W[3][1]=0;
+
+	A2W[0][2]=n.px;
+	A2W[1][2]=n.py;
+	A2W[2][2]=n.pz;
+	A2W[3][2]=0;
+
+	A2W[0][3]=tx;
+	A2W[1][3]=ty;
+	A2W[2][3]=tz;
+	A2W[3][3]=1;
+
+	invert(&A2W[0][0], &W2A[0][0]);
+
+    o=newPlane(0, 0, 0, 0, 1.0, 1.0, 1.0, 1, 1, 2);	
+	memcpy(&o->T[0][0], &A2W[0][0], 16*sizeof(double));
+	Scale(o, sx/2, sy/2, 1);
+	invert(&o->T[0][0],&o->Tinv[0][0]);
+	//insertObject(o, o_list);			// Insert into object list
+
+    double du, dv;	// Increase along u and v directions for point light source coordinates
+    du=sx/(lx-1);		
+    dv=sy/(ly-1);
+    for (j=0; j<ly; j++) {
+    	for (i=0; i<lx; i++) {
+    		p.px = -sx/2 + i*du;
+    		p.py = -sy/2 + j*dv;
+    		p.pz = 0;
+    		p.pw = 1;
+    		matVecMult(A2W, &p);
+    		//l = newPLS(&p, r/(lx*ly), g/(lx*ly), b/(lx*ly));
+    		l = newPLS(&p, r, g, b);
+    		insertPLS(l, l_list);
+    	}
+    }
+    free(u);
+    free(v);
+    free(o);
+    free(l);
+
+    return;
 }
 
 ///////////////////////////////////

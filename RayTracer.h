@@ -151,5 +151,6 @@ void rayTrace(struct ray3D *ray, int depth, struct colourRGB *col, struct object
 void findFirstHit(struct ray3D *ray, double *lambda, struct object3D *Os, struct object3D **obj, struct point3D *p, struct point3D *n, double *a, double *b);
 void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n,struct ray3D *ray, int depth, double a, double b, struct colourRGB *col);
 void phongIllumination(struct pointLS *light, struct ray3D *ray, struct ray3D *light_ray, struct object3D *obj, struct point3D *p, struct point3D *n, struct colourRGB *col);	// Calculate the phong illumination value
+void areaLight(struct point3D *p1, struct point3D *p2, double R, double G, double B);
 
 #endif
