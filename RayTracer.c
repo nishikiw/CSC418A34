@@ -108,12 +108,26 @@ void buildScene(void)
  insertObject(o,&object_list);
 
  // Insert a single point light source.
- p.px=0;
- p.py=15.5;
- p.pz=-5.5;
- p.pw=1;
- l=newPLS(&p,.95,.95,.95);
- insertPLS(l,&light_list);
+ // p.px=0;
+ // p.py=15.5;
+ // p.pz=-5.5;
+ // p.pw=1;
+ // l=newPLS(&p,.95/2,.95/2,.95/2);
+ // insertPLS(l,&light_list);
+
+ // Insert another single point light source.
+ // p.px=1;
+ // p.py=15.5;
+ // p.pz=-5.5;
+ // p.pw=1;
+ // l=newPLS(&p,.95/2,.95/2,.95/2);
+ // insertPLS(l,&light_list);
+
+  // add an area light source
+  addAreaLight(1.0, 1.0, 0.0, 1.0, 0.0,\
+                  0.0, 15.5, -5.5, 2, 2,\
+                  0.95, 0.95, 0.95, &object_list, &light_list);
+
 
  // End of simple scene for Assignment 3
  // Keep in mind that you can define new types of objects such as cylinders and parametric surfaces,
@@ -123,6 +137,7 @@ void buildScene(void)
  //           the relflectance properties of your objects, and the number and type of light sources
  //           in the scene.
 }
+
 
 void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct ray3D *ray, int depth, double a, double b, struct colourRGB *col)
 {
@@ -352,9 +367,6 @@ void rayTrace(struct ray3D *ray, int depth, struct colourRGB *col, struct object
  // if you are unsure what to do here.
  ///////////////////////////////////////////////////////
 
- // &p = (struct point3D *)calloc(1,sizeof(struct point3D));
- // &n = (struct point3D *)calloc(1,sizeof(struct point3D));
-
  //find the closest intersection
   lambda = -1;
 
@@ -471,14 +483,12 @@ int main(int argc, char *argv[])
  g.px=0;
  g.py=0;
  g.pz=1;
- //g.pw=1;
  g.pw=0;
 
  // Define the 'up' vector to be the Y axis
  up.px=0;
  up.py=1;
  up.pz=0;
- //up.pw=1;
  up.pw=0;
   
 
