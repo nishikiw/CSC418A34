@@ -27,6 +27,7 @@ struct object3D *object_list;
 struct pointLS *light_list;
 int MAX_DEPTH;
 
+// the original scene of assignment
 void buildScene(void)
 {
  // Sets up all objects in the scene. This involves creating each object,
@@ -130,7 +131,7 @@ void buildScene(void)
  //           in the scene.
 }
 
-
+// build new scene
 void buildSceneA(void)
 {
  // Sets up all objects in the scene. This involves creating each object,
@@ -164,7 +165,6 @@ void buildSceneA(void)
  //        define and position objects.
  ///////////////////////////////////////
 
- // scen for A4
  // Let's add a plane placed on the bottom
  // Note the parameters: ra, rd, rs, rg, R, G, B, alpha, r_index, and shinyness)
  o=newPlane(.05,.75,.05,.05,.55,.8,.75,1,1,2);  // Note the plane is highly-reflective (rs=rg=.75) so we
@@ -177,7 +177,7 @@ void buildSceneA(void)
  RotateX(o, PI/2);
  Translate(o,0,-4.8, 8);
  invert(&o->T[0][0],&o->Tinv[0][0]);    // Very important! compute
- //loadTexture(o, "mandrill.ppm");
+ //loadTexture(o, "wmp.ppm");
  insertObject(o,&object_list);      // Insert into object list
 
  // add another plane placed on the left side
@@ -218,6 +218,7 @@ void buildSceneA(void)
  RotateY(o,PI/2);
  Translate(o,-1.3,1.0,3.5);
  invert(&o->T[0][0],&o->Tinv[0][0]);
+ loadTexture(o, "mandrill.ppm");
  insertObject(o,&object_list);
 
  o=newSphere(.05,.95,.95,.75,.75,.95,.55,1,1,50);
@@ -225,6 +226,7 @@ void buildSceneA(void)
  RotateZ(o,PI/1.5);
  Translate(o,1.6,1.1,5.0);
  invert(&o->T[0][0],&o->Tinv[0][0]);
+ loadTexture(o, "mandrill.ppm");
  insertObject(o,&object_list);
 
  o=newSphere(.05,.95,.95,.75,.95,.10,.10,1,1,50);
@@ -232,6 +234,7 @@ void buildSceneA(void)
  //RotateZ(o,PI/1.5);
  Translate(o, 4.3, -4.3, 8.0);
  invert(&o->T[0][0],&o->Tinv[0][0]);
+ loadTexture(o, "mcfaddin_2.ppm");
  insertObject(o,&object_list);
 
  o=newSphere(.05,.95,.95,.75,.10,.95,.10,1,1,50);
@@ -239,6 +242,7 @@ void buildSceneA(void)
  //RotateZ(o,PI/1.5);
  Translate(o, 4.3, -4.3, 7.0);
  invert(&o->T[0][0],&o->Tinv[0][0]);
+ loadTexture(o, "mandrill.ppm");
  insertObject(o,&object_list);
 
  o=newSphere(.05,.95,.95,.75,.10,.10,.95,1,1,50);
@@ -246,6 +250,7 @@ void buildSceneA(void)
  //RotateZ(o,PI/1.5);
  Translate(o, 4.3, -4.3, 6.0);
  invert(&o->T[0][0],&o->Tinv[0][0]);
+ loadTexture(o, "mcfaddin_2.ppm");
  insertObject(o,&object_list);
 
 
