@@ -112,7 +112,7 @@ void buildScene(void)
  p.py=15.5;
  p.pz=-5.5;
  p.pw=1;
- l=newPLS(&p,.95/2,.95/2,.95/2);
+ l=newPLS(&p,.95,.95,.95);
  insertPLS(l,&light_list);
 
   // add an area light source
@@ -130,8 +130,8 @@ void buildScene(void)
  //           in the scene.
 }
 
-// scene for A4
-void buildSceneA4(void)
+
+void buildSceneA(void)
 {
  // Sets up all objects in the scene. This involves creating each object,
  // defining the transformations needed to shape and position it as
@@ -164,82 +164,94 @@ void buildSceneA4(void)
  //        define and position objects.
  ///////////////////////////////////////
 
- // Simple scene for Assignment 3:
- // Insert a couple of objects. A plane and two spheres
- // with some transformations.
-
- // Let's add a plane
+ // scen for A4
+ // Let's add a plane placed on the bottom
  // Note the parameters: ra, rd, rs, rg, R, G, B, alpha, r_index, and shinyness)
  o=newPlane(.05,.75,.05,.05,.55,.8,.75,1,1,2);  // Note the plane is highly-reflective (rs=rg=.75) so we
             // should see some reflections if all is done properly.
             // Colour is close to cyan, and currently the plane is
             // completely opaque (alpha=1). The refraction index is
             // meaningless since alpha=1
- // for scene signature
- // o=newPlane(1.0, 0.0, 0.0, 0.0,.55,.8,.75,1,1,2);
- // for diffuse and ambient
- // o=newPlane(.05,.75, 0.0, 0.0,.55,.8,.75,1,1,2);
- Scale(o,6,6,1);        // Do a few transforms...
- RotateZ(o,PI/1.20);
- RotateX(o,PI/2.25);
- Translate(o,0,-3,10);
+ Scale(o,4.8,3.2,1);        // Do a few transforms...
+ //RotateZ(o,PI/1.20);
+ RotateX(o, PI/2);
+ Translate(o,0,-4.8, 8);
  invert(&o->T[0][0],&o->Tinv[0][0]);    // Very important! compute
-            // and store the inverse
-            // transform for this object!
- // add texture
- loadTexture(o, "stop_1.ppm");
- printf("loaded texture file\n");
+ //loadTexture(o, "mandrill.ppm");
  insertObject(o,&object_list);      // Insert into object list
 
- // Let's add another plane with texture colours
+ // add another plane placed on the left side
+ o=newPlane(.05,.75,.05,.05,.55,.8,.75,1,1,2);  // Note the plane is highly-reflective (rs=rg=.75) so we
+ Scale(o, 3.2, 4.8,1);        // Do a few transforms...
+ RotateX(o, PI);
+ RotateY(o, PI/2);
+ Translate(o,-4.8, 0.0, 8);
+ invert(&o->T[0][0],&o->Tinv[0][0]);    // Very important! compute
+ loadTexture(o, "mandrill.ppm");
+ insertObject(o,&object_list);      // Insert into object list
+
+ // add another plane placed on the right side
+ o=newPlane(.05,.75,.05,.05,.55,.8,.75,1,1,2);  // Note the plane is highly-reflective (rs=rg=.75) so we
+ Scale(o, 3.2, 4.8,1);        // Do a few transforms...
+ RotateX(o, PI);
+ RotateY(o, -PI/2);
+ Translate(o, 4.8, 0.0, 8);
+ invert(&o->T[0][0],&o->Tinv[0][0]);    // Very important! compute
+ loadTexture(o, "mandrill.ppm");
+ insertObject(o,&object_list);      // Insert into object list
+
+ // Let's add another plane with texture colours on the far side
  // Note the parameters: ra, rd, rs, rg, R, G, B, alpha, r_index, and shinyness)
- o=newPlane(.05,.75,.05,.05,.55,.8,.75,1,1,2);  // Note the plane is highly-reflective (rs=rg=.75)
- Scale(o,10,10,1);        // Do a few transforms...
+ o=newPlane(.05,.75,.05,.05,.55,.8,.75, 0.0,1,2);  // Note the plane is highly-reflective (rs=rg=.75)
+ Scale(o,12,12,1);        // Do a few transforms...
  //RotateZ(o,PI/1.20);
  RotateX(o,PI);
- Translate(o,0,0,24);
+ Translate(o,0,0,28);
  invert(&o->T[0][0],&o->Tinv[0][0]);    // Very important! compute
-            // and store the inverse
-            // transform for this object!
  // add texture
- loadTexture(o, "tree_2.ppm");
- printf("loaded texture file\n");
+ loadTexture(o, "mcfaddin_2.ppm");
  insertObject(o,&object_list);      // Insert into object list
 
  // Let's add a couple spheres
  o=newSphere(.05,.95,.35,.35,1,.25,.25,1,1,50);
- // for scene signature
- // o=newSphere(1.0, 0.0, 0.0, 0.0,1,.25,.25,1,1,50);
- // for diffuse and ambient
- // o=newSphere(.05,.95, 0.0, 0.0,1,.25,.25,1,1,50);
- Scale(o,.75,.5,1.5);
+ Scale(o,.4,.25,0.8);
  RotateY(o,PI/2);
- Translate(o,-1.45,1.1,3.5);
+ Translate(o,-1.3,1.0,3.5);
  invert(&o->T[0][0],&o->Tinv[0][0]);
  insertObject(o,&object_list);
 
  o=newSphere(.05,.95,.95,.75,.75,.95,.55,1,1,50);
- // for signature
- // o=newSphere(1.0, 0.0, 0.0, 0.0,.75,.95,.55,1,1,50);
- // for ambient and signature
- // o=newSphere(.05,.95, 0.0, 0.0,.75,.95,.55,1,1,50);
- Scale(o,.5,2.0,1.0);
+ Scale(o,.25,1.0,0.5);
  RotateZ(o,PI/1.5);
- Translate(o,1.75,1.25,5.0);
+ Translate(o,1.6,1.1,5.0);
  invert(&o->T[0][0],&o->Tinv[0][0]);
  insertObject(o,&object_list);
 
- // Insert a single point light source.
- // p.px=0;
- // p.py=15.5;
- // p.pz=-5.5;
- // p.pw=1;
- // l=newPLS(&p,.95/2,.95/2,.95/2);
- // insertPLS(l,&light_list);
+ o=newSphere(.05,.95,.95,.75,.95,.10,.10,1,1,50);
+ Scale(o, 0.5, 0.5, 0.5);
+ //RotateZ(o,PI/1.5);
+ Translate(o, 4.3, -4.3, 8.0);
+ invert(&o->T[0][0],&o->Tinv[0][0]);
+ insertObject(o,&object_list);
+
+ o=newSphere(.05,.95,.95,.75,.10,.95,.10,1,1,50);
+ Scale(o, 0.5, 0.5, 0.5);
+ //RotateZ(o,PI/1.5);
+ Translate(o, 4.3, -4.3, 7.0);
+ invert(&o->T[0][0],&o->Tinv[0][0]);
+ insertObject(o,&object_list);
+
+ o=newSphere(.05,.95,.95,.75,.10,.10,.95,1,1,50);
+ Scale(o, 0.5, 0.5, 0.5);
+ //RotateZ(o,PI/1.5);
+ Translate(o, 4.3, -4.3, 6.0);
+ invert(&o->T[0][0],&o->Tinv[0][0]);
+ insertObject(o,&object_list);
+
 
   // add an area light source
-  addAreaLight(2, 2, 0.0, 1.0, 0.0,\
-                  0.5, 15.5, -5.5, 2, 2,\
+  addAreaLight(0.5, 0.5, 0.0, 1.0, 0.0,\
+                  0.5, 15.5, -5.5, 1, 1,\
                   0.95, 0.95, 0.95, &object_list, &light_list);
 
 
@@ -570,8 +582,9 @@ int main(int argc, char *argv[])
  //        for Assignment 4 you need to create your own
  //        *interesting* scene.
  ///////////////////////////////////////////////////
- buildScene();		// Create a scene. This defines all the
+ //buildScene();		// Create a scene. This defines all the
 			// objects in the world of the raytracer
+ buildSceneA();
 
  //////////////////////////////////////////
  // TO DO: For Assignment 3 you can use the setup
@@ -660,9 +673,18 @@ int main(int argc, char *argv[])
     ///////////////////////////////////////////////////////////////////
 
     // the coordinates of a pixel in view coordinator
-    pc=*newPoint(cam->wl+(i+0.5)*du, cam->wt+(j+0.5)*dv, cam->f, 1.0);
+    // pc=*newPoint(cam->wl+(i+0.5)*du, cam->wt+(j+0.5)*dv, cam->f, 1.0);
+    pc.px = cam->wl+(i+0.5)*du;
+    pc.py = cam->wt+(j+0.5)*dv;
+    pc.pz = cam->f;
+    pc.pw = 1.0;
+
     // the direction of a ray in view coordinator
-    d=*newPoint(pc.px-cam->e.px, pc.py-cam->e.py, pc.pz-cam->e.pz, 0.0);
+    // d=*newPoint(pc.px-cam->e.px, pc.py-cam->e.py, pc.pz-cam->e.pz, 0.0);
+    d.px = pc.px-cam->e.px;
+    d.py = pc.py-cam->e.py;
+    d.pz = pc.pz-cam->e.pz;
+    d.pw = 0.0;
     // convert to world-space
     matVecMult(cam->C2W, &pc);
     matVecMult(cam->C2W, &d);

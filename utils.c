@@ -243,7 +243,7 @@ void planeIntersect(struct object3D *plane, struct ray3D *ray, double *lambda, s
     // TO DO for part4.
     // compute a b for texture mapping
     if (plane->texImg != NULL){
-      printf("TODO Part4: intersection on texture\n");
+      //printf("TODO Part4: intersection on texture\n");
       *a = (p->px+1.0)/2.0;
       *b = (p->py+1.0)/2.0;
     }
