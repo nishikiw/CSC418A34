@@ -112,15 +112,136 @@ void buildScene(void)
  p.py=15.5;
  p.pz=-5.5;
  p.pw=1;
- l=newPLS(&p,.95,.95,.95);
+ l=newPLS(&p,.95/2,.95/2,.95/2);
  insertPLS(l,&light_list);
 
   // add an area light source
-  // printf("areaLight call 1\n");
-  // addAreaLight(2.0, 1.0, 1.0, 1.0, 1.0,\
-  //                 0.0, 10.5, -5.5, 8, 4,\
+  // addAreaLight(2, 2, 0.0, 1.0, 0.0,\
+  //                 0.5, 15.5, -5.5, 2, 2,\
   //                 0.95, 0.95, 0.95, &object_list, &light_list);
-  // printf("areaLight call 2\n");
+
+
+ // End of simple scene for Assignment 3
+ // Keep in mind that you can define new types of objects such as cylinders and parametric surfaces,
+ // or, you can create code to handle arbitrary triangles and then define objects as surface meshes.
+ //
+ // Remember: A lot of the quality of your scene will depend on how much care you have put into defining
+ //           the relflectance properties of your objects, and the number and type of light sources
+ //           in the scene.
+}
+
+// scene for A4
+void buildSceneA4(void)
+{
+ // Sets up all objects in the scene. This involves creating each object,
+ // defining the transformations needed to shape and position it as
+ // desired, specifying the reflectance properties (albedos and colours)
+ // and setting up textures where needed.
+ // Light sources must be defined, positioned, and their colour defined.
+ // All objects must be inserted in the object_list. All light sources
+ // must be inserted in the light_list.
+ //
+ // To create hierarchical objects:
+ //   Copy the transform matrix from the parent node to the child, and
+ //   apply any required transformations afterwards.
+ //
+ // NOTE: After setting up the transformations for each object, don't
+ //       forget to set up the inverse transform matrix!
+
+ struct object3D *o;
+ struct pointLS *l;
+ struct point3D p;
+
+ ///////////////////////////////////////
+ // TO DO: For Assignment 3 you have to use
+ //        the simple scene provided
+ //        here, but for Assignment 4 you
+ //        *MUST* define your own scene.
+ //        Part of your mark will depend
+ //        on how nice a scene you
+ //        create. Use the simple scene
+ //        provided as a sample of how to
+ //        define and position objects.
+ ///////////////////////////////////////
+
+ // Simple scene for Assignment 3:
+ // Insert a couple of objects. A plane and two spheres
+ // with some transformations.
+
+ // Let's add a plane
+ // Note the parameters: ra, rd, rs, rg, R, G, B, alpha, r_index, and shinyness)
+ o=newPlane(.05,.75,.05,.05,.55,.8,.75,1,1,2);  // Note the plane is highly-reflective (rs=rg=.75) so we
+            // should see some reflections if all is done properly.
+            // Colour is close to cyan, and currently the plane is
+            // completely opaque (alpha=1). The refraction index is
+            // meaningless since alpha=1
+ // for scene signature
+ // o=newPlane(1.0, 0.0, 0.0, 0.0,.55,.8,.75,1,1,2);
+ // for diffuse and ambient
+ // o=newPlane(.05,.75, 0.0, 0.0,.55,.8,.75,1,1,2);
+ Scale(o,6,6,1);        // Do a few transforms...
+ RotateZ(o,PI/1.20);
+ RotateX(o,PI/2.25);
+ Translate(o,0,-3,10);
+ invert(&o->T[0][0],&o->Tinv[0][0]);    // Very important! compute
+            // and store the inverse
+            // transform for this object!
+ // add texture
+ loadTexture(o, "stop_1.ppm");
+ printf("loaded texture file\n");
+ insertObject(o,&object_list);      // Insert into object list
+
+ // Let's add another plane with texture colours
+ // Note the parameters: ra, rd, rs, rg, R, G, B, alpha, r_index, and shinyness)
+ o=newPlane(.05,.75,.05,.05,.55,.8,.75,1,1,2);  // Note the plane is highly-reflective (rs=rg=.75)
+ Scale(o,10,10,1);        // Do a few transforms...
+ //RotateZ(o,PI/1.20);
+ RotateX(o,PI);
+ Translate(o,0,0,24);
+ invert(&o->T[0][0],&o->Tinv[0][0]);    // Very important! compute
+            // and store the inverse
+            // transform for this object!
+ // add texture
+ loadTexture(o, "tree_2.ppm");
+ printf("loaded texture file\n");
+ insertObject(o,&object_list);      // Insert into object list
+
+ // Let's add a couple spheres
+ o=newSphere(.05,.95,.35,.35,1,.25,.25,1,1,50);
+ // for scene signature
+ // o=newSphere(1.0, 0.0, 0.0, 0.0,1,.25,.25,1,1,50);
+ // for diffuse and ambient
+ // o=newSphere(.05,.95, 0.0, 0.0,1,.25,.25,1,1,50);
+ Scale(o,.75,.5,1.5);
+ RotateY(o,PI/2);
+ Translate(o,-1.45,1.1,3.5);
+ invert(&o->T[0][0],&o->Tinv[0][0]);
+ insertObject(o,&object_list);
+
+ o=newSphere(.05,.95,.95,.75,.75,.95,.55,1,1,50);
+ // for signature
+ // o=newSphere(1.0, 0.0, 0.0, 0.0,.75,.95,.55,1,1,50);
+ // for ambient and signature
+ // o=newSphere(.05,.95, 0.0, 0.0,.75,.95,.55,1,1,50);
+ Scale(o,.5,2.0,1.0);
+ RotateZ(o,PI/1.5);
+ Translate(o,1.75,1.25,5.0);
+ invert(&o->T[0][0],&o->Tinv[0][0]);
+ insertObject(o,&object_list);
+
+ // Insert a single point light source.
+ // p.px=0;
+ // p.py=15.5;
+ // p.pz=-5.5;
+ // p.pw=1;
+ // l=newPLS(&p,.95/2,.95/2,.95/2);
+ // insertPLS(l,&light_list);
+
+  // add an area light source
+  addAreaLight(2, 2, 0.0, 1.0, 0.0,\
+                  0.5, 15.5, -5.5, 2, 2,\
+                  0.95, 0.95, 0.95, &object_list, &light_list);
+
 
  // End of simple scene for Assignment 3
  // Keep in mind that you can define new types of objects such as cylinders and parametric surfaces,
@@ -194,14 +315,14 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
    lambda = -1;
    findFirstHit(cur_shadow_ray, &lambda, obj, &findFirstHit_obj, first_hit_p, first_hit_n, &a, &b);
    if (lambda > 0 && lambda < 1){
-  	tmp_col.R = obj->alb.ra * cur_light->col.R * R;
-  	tmp_col.G = obj->alb.ra * cur_light->col.G * G;
-  	tmp_col.B = obj->alb.ra * cur_light->col.B * B;
+  	tmp_col.R += obj->alb.ra * cur_light->col.R * R;
+  	tmp_col.G += obj->alb.ra * cur_light->col.G * G;
+  	tmp_col.B += obj->alb.ra * cur_light->col.B * B;
    } else {
     phongIllumination(cur_light, ray, cur_shadow_ray, obj, p, n, phong_col);
-	  tmp_col.R = R * phong_col->R;
-    tmp_col.G = G * phong_col->G;
-    tmp_col.B = B * phong_col->B;
+	  tmp_col.R += R * phong_col->R;
+    tmp_col.G += G * phong_col->G;
+    tmp_col.B += B * phong_col->B;
    }
    cur_light = cur_light->next;
    free(light_ray);
@@ -311,15 +432,15 @@ void findFirstHit(struct ray3D *ray, double *lambda, struct object3D *Os, struct
   }
 
   while (cur_obj!=NULL) {
-	if (cur_obj != Os){
-		cur_obj->intersect(cur_obj, ray, &lambda1, &p1, &n1, a, b);
-		if (lambda1 >= 0 && (*lambda == -1 || lambda1 < *lambda)) {
-		*lambda = lambda1;
-		*obj = cur_obj;
-		*p = p1;
-		*n = n1;
-		}
-	}
+  	if (cur_obj != Os){
+  		cur_obj->intersect(cur_obj, ray, &lambda1, &p1, &n1, a, b);
+  		if (lambda1 >= 0 && (*lambda == -1 || lambda1 < *lambda)) {
+  		*lambda = lambda1;
+  		*obj = cur_obj;
+  		*p = p1;
+  		*n = n1;
+  		}
+  	}
     cur_obj=cur_obj->next;
   }
   
@@ -555,8 +676,9 @@ int main(int argc, char *argv[])
 
     // call rayTrace
     rayTrace(ray, 0, &col, NULL);
+    free(ray);
 
-    if (col.R < 0) {
+    if (col.R <= 0) {
       rgbIm[(j*sx + i)*3] = background.R * 255;
       rgbIm[(j*sx + i)*3 + 1] = background.G * 255;
       rgbIm[(j*sx + i)*3 + 2] = background.B * 255;

@@ -7,6 +7,8 @@
    understand how the entire code works.
 */
 
+// texture images are from http://www.cs.cornell.edu/courses/cs664/2003fa/images/
+
 #include "utils.h"
 #include <math.h>
 
@@ -201,6 +203,8 @@ void planeIntersect(struct object3D *plane, struct ray3D *ray, double *lambda, s
  /////////////////////////////////
  // TO DO: Complete this function.
  /////////////////////////////////
+
+  double u, v;
 	
 	// Transfom the ray to object space.
 	struct point3D *ray_transformed_p0, *ray_transformed_d;
@@ -236,6 +240,14 @@ void planeIntersect(struct object3D *plane, struct ray3D *ray, double *lambda, s
 	}
 	
 	if (p->px >= -1 && p->px <= 1 && p->py >= -1 && p->py <= 1){
+    // TO DO for part4.
+    // compute a b for texture mapping
+    if (plane->texImg != NULL){
+      printf("TODO Part4: intersection on texture\n");
+      *a = (p->px+1.0)/2.0;
+      *b = (p->py+1.0)/2.0;
+    }
+    
 		memcpy(lambda, &t, sizeof(double));
 		matVecMult(plane->T, p);
 		normalTransform(n_orig, n, plane);
@@ -247,10 +259,6 @@ void planeIntersect(struct object3D *plane, struct ray3D *ray, double *lambda, s
 		return;
 	}
 	
-	// TO DO for part4.
-	if (plane->texImg != NULL){
-		printf("TODO Part4: intersection on texture\n");
-	}
 	
 	free(ray_transformed_p0);
 	free(ray_transformed_d);
@@ -361,10 +369,32 @@ void texMap(struct image *img, double a, double b, double *R, double *G, double 
  // coordinates. Your code should use bi-linear
  // interpolation to obtain the texture colour.
  //////////////////////////////////////////////////
+  // we use bi-linear interpolation to obtain the texture colour
+  int i, j;
+  double up, vp;
+  double *rgbIm;
 
- *(R)=0;	// Returns black - delete this and
- *(G)=0;	// replace with your code to compute
- *(B)=0;	// texture colour at (a,b)
+  rgbIm=(double *)img->rgbdata;
+  i = floor(a*img->sx);
+  j = floor(b*img->sy);
+  up = a*img->sx - i;
+  vp = b*img->sy - j;
+  *R = (1-up)*(1-vp)*rgbIm[(j*img->sx+i)*3] + \
+       up*(1-vp)*rgbIm[((j+1)*img->sx+i)*3] + \
+       (1-up)*vp*rgbIm[(j*img->sx+i+1)*3] + \
+       up*vp*rgbIm[((j+1)*img->sx+i+1)*3];
+  *G = (1-up)*(1-vp)*rgbIm[(j*img->sx+i)*3 + 1] + \
+       up*(1-vp)*rgbIm[((j+1)*img->sx+i)*3 +1] + \
+       (1-up)*vp*rgbIm[(j*img->sx+i+1)*3 + 1] + \
+       up*vp*rgbIm[((j+1)*img->sx+i+1)*3 +1];
+  *B = (1-up)*(1-vp)*rgbIm[(j*img->sx+i)*3 + 2] + \
+       up*(1-vp)*rgbIm[((j+1)*img->sx+i)*3 + 2] + \
+       (1-up)*vp*rgbIm[(j*img->sx+i+1)*3 + 2] + \
+       up*vp*rgbIm[((j+1)*img->sx+i+1)*3 + 2];
+
+ // *(R)=0;	// Returns black - delete this and
+ // *(G)=0;	// replace with your code to compute
+ // *(B)=0;	// texture colour at (a,b)
  return;
 }
 
@@ -423,26 +453,34 @@ void addAreaLight(float sx, float sy, float nx, float ny, float nz,\
   // TO DO: (Assignment 4!)
   // Implement this function to enable area light sources
   /////////////////////////////////////////////////////
-    struct point3D up;    // up vector
-    struct point3D n;     // normal vector
-    struct point3D *u, *v;    // u v n form area light source coordinates
-    double W2A[4][4];	// World2Area conversion matrix
+  struct point3D up;    // up vector
+  struct point3D n;     // normal vector
+  struct point3D *u, *v;    // u v n form area light source coordinates
 	double A2W[4][4];	// Area2World conversion matrix 
 	struct object3D *o; // the rectanglar area light source object
 	struct pointLS *l;
 	struct point3D p;
 	int i, j;
 
-    // Define the 'up' vector to be the Y axis
-    up.px=0;
-	up.py=1;
-	up.pz=0;
-	up.pw=0;
 	// obtain normal vector from input
 	n.px=nx;
 	n.py=ny;
 	n.pz=nz;
 	n.pw=0;
+
+  // Define the 'up' vector to be not in the same direction as normal vector
+  if (n.px == 0){
+    up.px = 1;
+    up.py = 0;
+    up.pz = 0;
+  }
+  else{
+    up.px = 0;
+    up.py = 1;
+    up.pz = 0;
+  }
+  up.pw=0;
+
 	normalize(&n);
 	// set up u and v
 	u=cross(&n, &up);
@@ -472,35 +510,77 @@ void addAreaLight(float sx, float sy, float nx, float ny, float nz,\
 	A2W[2][3]=tz;
 	A2W[3][3]=1;
 
-	invert(&A2W[0][0], &W2A[0][0]);
+  o=newPlane(0.05, 0, 0, 0, 0.0, 0.0, 1.0, 1, 1, 2);
+  o->isLightSource = 1;
+  Scale(o, sx/2, sy/2, 1);
+  matMult(A2W, o->T);
+  invert(&o->T[0][0],&o->Tinv[0][0]);
+  insertObject(o, o_list);			// Insert into object list
 
-    o=newPlane(0, 0, 0, 0, 1.0, 1.0, 1.0, 1, 1, 2);	
-	memcpy(&o->T[0][0], &A2W[0][0], 16*sizeof(double));
-	Scale(o, sx/2, sy/2, 1);
-	invert(&o->T[0][0],&o->Tinv[0][0]);
-	//insertObject(o, o_list);			// Insert into object list
+  double du, dv;	// Increase along u and v directions for point light source coordinates
+  if (lx==1 && ly==1) {
+    p.px = 0;
+    p.py = 0;
+    p.pz = 0;
+    p.pw = 1;
+    matVecMult(o->T, &p);
+    l = newPLS(&p, r/(lx*ly), g/(lx*ly), b/(lx*ly));
+    insertPLS(l, l_list);
+    free(u);
+    free(v);
+    return;
+  }
 
-    double du, dv;	// Increase along u and v directions for point light source coordinates
-    du=sx/(lx-1);		
-    dv=sy/(ly-1);
-    for (j=0; j<ly; j++) {
-    	for (i=0; i<lx; i++) {
-    		p.px = -sx/2 + i*du;
-    		p.py = -sy/2 + j*dv;
-    		p.pz = 0;
-    		p.pw = 1;
-    		matVecMult(A2W, &p);
-    		//l = newPLS(&p, r/(lx*ly), g/(lx*ly), b/(lx*ly));
-    		l = newPLS(&p, r, g, b);
-    		insertPLS(l, l_list);
-    	}
+  if (lx>1 && ly==1) {
+    du=2.0/(lx-1);
+    for (i=0; i<lx; i++) {
+      p.px = -1 + i*du;
+      p.py = 0;
+      p.pz = 0;
+      p.pw = 1;
+      matVecMult(o->T, &p);
+      l = newPLS(&p, r/(lx*ly), g/(lx*ly), b/(lx*ly));
+      insertPLS(l, l_list);
     }
     free(u);
     free(v);
-    free(o);
-    free(l);
-
     return;
+  }
+
+  if (lx==1 && ly>1) {
+    dv=2.0/(ly-1);
+    for (j=0; j<ly; j++) {
+      p.px = 0;
+      p.py = -1 + j*dv;
+      p.pz = 0;
+      p.pw = 1;
+      matVecMult(o->T, &p);
+      l = newPLS(&p, r/(lx*ly), g/(lx*ly), b/(lx*ly));
+      insertPLS(l, l_list);
+    }
+    free(u);
+    free(v);
+    return;
+  }
+
+  if (lx>1 && ly>1) {
+    du=2.0/(lx-1);   
+    dv=2.0/(ly-1);
+    for (j=0; j<ly; j++) {
+      for (i=0; i<lx; i++) {
+        p.px = -1 + i*du;
+        p.py = -1 + j*dv;
+        p.pz = 0;
+        p.pw = 1;
+        matVecMult(o->T, &p);
+        l = newPLS(&p, r/(lx*ly), g/(lx*ly), b/(lx*ly));
+        insertPLS(l, l_list);
+      }
+    }
+    free(u);
+    free(v);
+    return;
+  }
 }
 
 ///////////////////////////////////

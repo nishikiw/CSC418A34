@@ -106,14 +106,14 @@ struct object3D{
   	// texture colour at that point using bi-linear interpolation 
 	void (*textureMap)(struct image *img, double a, double b, double *R, double *G, double *B);
 
-        struct image *texImg;				// Pointer to structure
+    struct image *texImg;				// Pointer to structure
 							// holding the texture
 							// for this object
 	double  alpha;		// Opacity - if less than 1 this is a semi
 				// transparent object and refraction rays
 				// should be implemented
 	double  r_index;		// Index of refraction
-        double  shinyness;	// Exponent for the Phong specular component
+    double  shinyness;	// Exponent for the Phong specular component
 	int 	frontAndBack;	// Flag to indicate that both sides of the object
 				// should be lit.
 	int	isLightSource;	// Flag to indicate if this is an area light source
@@ -151,6 +151,5 @@ void rayTrace(struct ray3D *ray, int depth, struct colourRGB *col, struct object
 void findFirstHit(struct ray3D *ray, double *lambda, struct object3D *Os, struct object3D **obj, struct point3D *p, struct point3D *n, double *a, double *b);
 void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n,struct ray3D *ray, int depth, double a, double b, struct colourRGB *col);
 void phongIllumination(struct pointLS *light, struct ray3D *ray, struct ray3D *light_ray, struct object3D *obj, struct point3D *p, struct point3D *n, struct colourRGB *col);	// Calculate the phong illumination value
-void areaLight(struct point3D *p1, struct point3D *p2, double R, double G, double B);
 
 #endif
