@@ -7,6 +7,8 @@
    understand how the entire code works.
 */
 
+// texture images are from http://www.cs.cornell.edu/courses/cs664/2003fa/images/
+
 #include "utils.h"
 #include <math.h>
 
@@ -201,6 +203,8 @@ void planeIntersect(struct object3D *plane, struct ray3D *ray, double *lambda, s
  /////////////////////////////////
  // TO DO: Complete this function.
  /////////////////////////////////
+
+  double u, v;
 	
 	// Transfom the ray to object space.
 	struct point3D *ray_transformed_p0, *ray_transformed_d;
@@ -236,6 +240,14 @@ void planeIntersect(struct object3D *plane, struct ray3D *ray, double *lambda, s
 	}
 	
 	if (p->px >= -1 && p->px <= 1 && p->py >= -1 && p->py <= 1){
+    // TO DO for part4.
+    // compute a b for texture mapping
+    if (plane->texImg != NULL){
+      printf("TODO Part4: intersection on texture\n");
+      *a = (p->px+1.0)/2.0;
+      *b = (p->py+1.0)/2.0;
+    }
+    
 		memcpy(lambda, &t, sizeof(double));
 		matVecMult(plane->T, p);
 		normalTransform(n_orig, n, plane);
@@ -247,10 +259,6 @@ void planeIntersect(struct object3D *plane, struct ray3D *ray, double *lambda, s
 		return;
 	}
 	
-	// TO DO for part4.
-	if (plane->texImg != NULL){
-		printf("TODO Part4: intersection on texture\n");
-	}
 	
 	free(ray_transformed_p0);
 	free(ray_transformed_d);
@@ -361,10 +369,32 @@ void texMap(struct image *img, double a, double b, double *R, double *G, double 
  // coordinates. Your code should use bi-linear
  // interpolation to obtain the texture colour.
  //////////////////////////////////////////////////
+  // we use bi-linear interpolation to obtain the texture colour
+  int i, j;
+  double up, vp;
+  unsigned char *rgbIm;
 
- *(R)=0;	// Returns black - delete this and
- *(G)=0;	// replace with your code to compute
- *(B)=0;	// texture colour at (a,b)
+  rgbIm=(unsigned char *)img->rgbdata;
+  i = floor(a*img->sx);
+  j = floor(b*img->sy);
+  up = a*img->sx - i;
+  vp = b*img->sy - j;
+  *R = (1-up)*(1-vp)*rgbIm[(j*img->sx+i)*3]/255 + \
+       up*(1-vp)*rgbIm[((j+1)*img->sx+i)*3]/255 + \
+       (1-up)*vp*rgbIm[(j*img->sx+i+1)*3]/255 + \
+       up*vp*rgbIm[((j+1)*img->sx+i+1)*3]/255;
+  *G = (1-up)*(1-vp)*rgbIm[(j*img->sx+i)*3 + 1]/255 + \
+       up*(1-vp)*rgbIm[((j+1)*img->sx+i)*3 +1]/255 + \
+       (1-up)*vp*rgbIm[(j*img->sx+i+1)*3 + 1]/255 + \
+       up*vp*rgbIm[((j+1)*img->sx+i+1)*3 +1]/255;
+  *B = (1-up)*(1-vp)*rgbIm[(j*img->sx+i)*3 + 2]/255 + \
+       up*(1-vp)*rgbIm[((j+1)*img->sx+i)*3 + 2]/255 + \
+       (1-up)*vp*rgbIm[(j*img->sx+i+1)*3 + 2] /255+ \
+       up*vp*rgbIm[((j+1)*img->sx+i+1)*3 + 2]/255;
+
+ // *(R)=0;	// Returns black - delete this and
+ // *(G)=0;	// replace with your code to compute
+ // *(B)=0;	// texture colour at (a,b)
  return;
 }
 
@@ -426,7 +456,6 @@ void addAreaLight(float sx, float sy, float nx, float ny, float nz,\
   struct point3D up;    // up vector
   struct point3D n;     // normal vector
   struct point3D *u, *v;    // u v n form area light source coordinates
-//  double W2A[4][4];	// World2Area conversion matrix
 	double A2W[4][4];	// Area2World conversion matrix 
 	struct object3D *o; // the rectanglar area light source object
 	struct pointLS *l;
@@ -481,9 +510,8 @@ void addAreaLight(float sx, float sy, float nx, float ny, float nz,\
 	A2W[2][3]=tz;
 	A2W[3][3]=1;
 
-	//invert(&A2W[0][0], &W2A[0][0]);
-
   o=newPlane(0.05, 0, 0, 0, 0.0, 0.0, 1.0, 1, 1, 2);
+  o->isLightSource = 1;
   Scale(o, sx/2, sy/2, 1);
   matMult(A2W, o->T);
 	invert(&o->T[0][0],&o->Tinv[0][0]);
@@ -497,7 +525,6 @@ void addAreaLight(float sx, float sy, float nx, float ny, float nz,\
     p.pw = 1;
     matVecMult(o->T, &p);
     l = newPLS(&p, r/(lx*ly), g/(lx*ly), b/(lx*ly));
-    //l = newPLS(&p, r, g, b);
     insertPLS(l, l_list);
     free(u);
     free(v);
@@ -513,7 +540,6 @@ void addAreaLight(float sx, float sy, float nx, float ny, float nz,\
       p.pw = 1;
       matVecMult(o->T, &p);
       l = newPLS(&p, r/(lx*ly), g/(lx*ly), b/(lx*ly));
-      //l = newPLS(&p, r, g, b);
       insertPLS(l, l_list);
     }
     free(u);
@@ -530,7 +556,6 @@ void addAreaLight(float sx, float sy, float nx, float ny, float nz,\
       p.pw = 1;
       matVecMult(o->T, &p);
       l = newPLS(&p, r/(lx*ly), g/(lx*ly), b/(lx*ly));
-      //l = newPLS(&p, r, g, b);
       insertPLS(l, l_list);
     }
     free(u);
@@ -548,9 +573,7 @@ void addAreaLight(float sx, float sy, float nx, float ny, float nz,\
         p.pz = 0;
         p.pw = 1;
         matVecMult(o->T, &p);
-
         l = newPLS(&p, r/(lx*ly), g/(lx*ly), b/(lx*ly));
-        //l = newPLS(&p, r, g, b);
         insertPLS(l, l_list);
       }
     }

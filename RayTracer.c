@@ -82,6 +82,9 @@ void buildScene(void)
  invert(&o->T[0][0],&o->Tinv[0][0]);		// Very important! compute
 						// and store the inverse
 						// transform for this object!
+ // add texture
+ loadTexture(o, "stop_1.ppm");
+ printf("loaded texture file\n");
  insertObject(o,&object_list);			// Insert into object list
 
  // Let's add a couple spheres
@@ -115,17 +118,9 @@ void buildScene(void)
  // l=newPLS(&p,.95/2,.95/2,.95/2);
  // insertPLS(l,&light_list);
 
- // Insert another single point light source.
- // p.px=1;
- // p.py=15.5;
- // p.pz=-5.5;
- // p.pw=1;dd
- // l=newPLS(&p,.95/2,.95/2,.95/2);
- // insertPLS(l,&light_list);
-
   // add an area light source
   addAreaLight(2, 2, 0.0, 1.0, 0.0,\
-                  0.5, 15.5, -5.5, 7, 7,\
+                  0.5, 15.5, -5.5, 2, 2,\
                   0.95, 0.95, 0.95, &object_list, &light_list);
 
 
@@ -318,15 +313,16 @@ void findFirstHit(struct ray3D *ray, double *lambda, struct object3D *Os, struct
   }
 
   while (cur_obj!=NULL) {
-	if (cur_obj != Os){
-		cur_obj->intersect(cur_obj, ray, &lambda1, &p1, &n1, a, b);
-		if (lambda1 >= 0 && (*lambda == -1 || lambda1 < *lambda)) {
-		*lambda = lambda1;
-		*obj = cur_obj;
-		*p = p1;
-		*n = n1;
-		}
-	}
+  	if (cur_obj != Os){
+  		cur_obj->intersect(cur_obj, ray, &lambda1, &p1, &n1, a, b);
+  		if (lambda1 >= 0 && (*lambda == -1 || lambda1 < *lambda)) {
+  		*lambda = lambda1;
+  		*obj = cur_obj;
+  		*p = p1;
+  		*n = n1;
+  		}
+  	}
+    printf("a=%lf, b=%lf\n", *a, *b);
     cur_obj=cur_obj->next;
   }
   
