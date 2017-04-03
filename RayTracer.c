@@ -78,6 +78,7 @@ void buildScene(void)
  // o=newPlane(1.0, 0.0, 0.0, 0.0,.55,.8,.75,1,1,2);
  // for diffuse and ambient
  // o=newPlane(.05,.75, 0.0, 0.0,.55,.8,.75,1,1,2);
+ 
  Scale(o,6,6,1);				// Do a few transforms...
  RotateZ(o,PI/1.20);
  RotateX(o,PI/2.25);
@@ -93,6 +94,8 @@ void buildScene(void)
  // o=newSphere(1.0, 0.0, 0.0, 0.0,1,.25,.25,1,1,50);
  // for diffuse and ambient
  // o=newSphere(.05,.95, 0.0, 0.0,1,.25,.25,1,1,50);
+ // for refraction
+ //o=newSphere(.05,.95, 0.0, 0.0,1,.25,.25,0.8,0.5,50);
  Scale(o,.75,.5,1.5);
  RotateY(o,PI/2);
  Translate(o,-1.45,1.1,3.5);
@@ -104,6 +107,8 @@ void buildScene(void)
  // o=newSphere(1.0, 0.0, 0.0, 0.0,.75,.95,.55,1,1,50);
  // for ambient and signature
  // o=newSphere(.05,.95, 0.0, 0.0,.75,.95,.55,1,1,50);
+ // for refraction
+ //o=newSphere(.05,.95, 0.0, 0.0,1,.25,.25,0.2,0.5,50);
  Scale(o,.5,2.0,1.0);
  RotateZ(o,PI/1.5);
  Translate(o,1.75,1.25,5.0);
@@ -370,17 +375,25 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
   col->B = tmp_col.B;
 
   if (depth < MAX_DEPTH){
-   struct point3D *reflect_ray_p0 = p;
+   // Reflection ray.
+   struct point3D *reflect_ray_p0 = newPoint(p->px, p->py, p->pz, 1);
+   struct point3D *offset_n = newPoint(n->px/pow(2, 20), n->py/pow(2, 20), n->pz/pow(2, 20), 0);
+   addVectors(offset_n, reflect_ray_p0);
    struct point3D *reversed_ray_d = newPoint(-ray->d.px, -ray->d.py, -ray->d.pz, 0);
    double vn = dot(reversed_ray_d, n);
    struct point3D *reflect_ray_d = newPoint(2*vn*n->px - reversed_ray_d->px, 2*vn*n->py - reversed_ray_d->py, 2*vn*n->pz - reversed_ray_d->pz, 0.0);
    normalize(reflect_ray_d);
    struct ray3D *reflect_ray = newRay(reflect_ray_p0, reflect_ray_d);
    rayTrace(reflect_ray, depth+1, col, obj);
+   free(reflect_ray_p0);
    free(reflect_ray_d);
    free(reflect_ray);
    free(reversed_ray_d);
+   free(offset_n);
+   // Refraction ray.
+    
   }
+
  }
 
  free(cur_shadow_ray_d);

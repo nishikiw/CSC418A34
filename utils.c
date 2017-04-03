@@ -288,10 +288,10 @@ void sphereIntersect(struct object3D *sphere, struct ray3D *ray, double *lambda,
 	C = dot(&ray_transformed->p0, &ray_transformed->p0) - 1;
 	
 	// t2 >= t1
-	t = (-B - sqrt(B * B - 4 * A * C))/(2 * A);
-	//t2 = (-B + sqrt(B * B - 4 * A * C))/(2 * A);
+	t1 = (-B - sqrt(B * B - 4 * A * C))/(2 * A);
+	t2 = (-B + sqrt(B * B - 4 * A * C))/(2 * A);
 	
-	/* if (t1 < 0){
+	if (t1 < 0){
 		if (t2 < 0){
 			//printf("ERROR: SPHEREINTERSECT - invalid intersection.\n");
 			t = -1;
@@ -304,7 +304,7 @@ void sphereIntersect(struct object3D *sphere, struct ray3D *ray, double *lambda,
 	}
 	else{
 		t = t1;
-	} */
+	}
 
   // Invalid intersection.
   if (t < 0 || A == 0 || B * B - 4 * A * C < 0){
