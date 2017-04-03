@@ -204,7 +204,7 @@ void planeIntersect(struct object3D *plane, struct ray3D *ray, double *lambda, s
  // TO DO: Complete this function.
  /////////////////////////////////
 
-  double u, v;
+  //double u, v;
 	
 	// Transfom the ray to object space.
 	struct point3D *ray_transformed_p0, *ray_transformed_d;
@@ -243,7 +243,7 @@ void planeIntersect(struct object3D *plane, struct ray3D *ray, double *lambda, s
     // TO DO for part4.
     // compute a b for texture mapping
     if (plane->texImg != NULL){
-      printf("TODO Part4: intersection on texture\n");
+      //printf("TODO Part4: intersection on texture\n");
       *a = (p->px+1.0)/2.0;
       *b = (p->py+1.0)/2.0;
     }
@@ -281,6 +281,7 @@ void sphereIntersect(struct object3D *sphere, struct ray3D *ray, double *lambda,
 	rayTransform(ray, ray_transformed, sphere);
 	
 	double t, t1, t2, A, B, C;
+  double theta, phi;
 	
 	A = dot(&ray_transformed->d, &ray_transformed->d);
 	B = 2 * dot(&ray_transformed->d, &ray_transformed->p0);
@@ -314,17 +315,31 @@ void sphereIntersect(struct object3D *sphere, struct ray3D *ray, double *lambda,
   }
 
 	rayPosition(ray_transformed, t, p);
+
+  // TO DO for part4.
+  // compute a b for texture mapping
+  if (sphere->texImg != NULL){
+    //printf("TODO Part4: intersection on texture\n");
+    theta = acos(p->pz);
+    phi = atan(p->py/p->px);
+    if (p->px>0 && p->py>0) {
+    	*a = (2*PI-phi)/(2*PI);
+    }
+    if (p->px<0) {
+    	*a = (PI-phi)/(2*PI);
+    }
+    if (p->px>0 && p->py<0) {
+    	*a = (-phi)/(2*PI);
+    }
+    *b = (PI-theta)/PI;
+  }
 	
 	point3D *n_orig = newPoint(p->px, p->py, p->pz, 0);
 	
 	memcpy(lambda, &t, sizeof(double));
 	matVecMult(sphere->T, p);
 	normalTransform(n_orig, n, sphere);
-	
-	// TO DO for part4.
-	if (sphere->texImg != NULL){
-		printf("TODO Part4: intersection on texture\n");
-	}
+
 	
 	free(ray_transformed_p0);
 	free(ray_transformed_d);
