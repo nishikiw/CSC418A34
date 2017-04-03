@@ -693,50 +693,52 @@ int main(int argc, char *argv[])
   for (i=0;i<sx;i++)
   {
 	
-	// Divide the pixel into n by n subpixels.
-	int n = 2;
-	double sub_du = du/n;
-	double sub_dv = dv/n;
-	
-	col.R=0.0;
-    col.G=0.0;
-    col.B=0.0;
-	
-	// Generate n^2 rays to get the sum color.
-	for (int iter_v = 0; iter_v < n; iter_v++){
-		for (int iter_h = 0; iter_h < n; iter_h++){ 
-			pc.px = cam->wl + i*du + iter_h*sub_du + rand()/(RAND_MAX/sub_du);
-			pc.py = cam->wt + j*dv + iter_v*sub_dv + rand()/(RAND_MAX/sub_dv);
-			pc.pz = cam->f;
-			pc.pw = 1.0;
-			
-			d.px = pc.px-cam->e.px;
-			d.py = pc.py-cam->e.py;
-			d.pz = pc.pz-cam->e.pz;
-			d.pw = 0.0;
-			
-			matVecMult(cam->C2W, &pc);
-			matVecMult(cam->C2W, &d);
-			
-			ray=newRay(&pc, &d);
-			
-			sub_col.R=0.0;
-			sub_col.G=0.0;
-			sub_col.B=0.0;
-			
-			rayTrace(ray, 0, &sub_col, NULL);
-			free(ray);
-			
-			col.R += sub_col.R;
-			col.G += sub_col.G;
-			col.B += sub_col.B;
+	// antialiasing: the pixel into n by n subpixels.
+	if (antialiasing == 1){
+		int n = 3;
+		double sub_du = du/n;
+		double sub_dv = dv/n;
+		
+		col.R=0.0;
+		col.G=0.0;
+		col.B=0.0;
+		
+		// Generate n^2 rays to get the sum color.
+		for (int iter_v = 0; iter_v < n; iter_v++){
+			for (int iter_h = 0; iter_h < n; iter_h++){ 
+				pc.px = cam->wl + i*du + iter_h*sub_du + rand()/(RAND_MAX/sub_du);
+				pc.py = cam->wt + j*dv + iter_v*sub_dv + rand()/(RAND_MAX/sub_dv);
+				pc.pz = cam->f;
+				pc.pw = 1.0;
+				
+				d.px = pc.px-cam->e.px;
+				d.py = pc.py-cam->e.py;
+				d.pz = pc.pz-cam->e.pz;
+				d.pw = 0.0;
+				
+				matVecMult(cam->C2W, &pc);
+				matVecMult(cam->C2W, &d);
+				
+				ray=newRay(&pc, &d);
+				
+				sub_col.R=0.0;
+				sub_col.G=0.0;
+				sub_col.B=0.0;
+				
+				rayTrace(ray, 0, &sub_col, NULL);
+				free(ray);
+				
+				col.R += sub_col.R;
+				col.G += sub_col.G;
+				col.B += sub_col.B;
+			}
 		}
-	}
-	
-	// pixel color is the average of all sub pixel colors.
-	col.R = col.R / (n*n);
-	col.G = col.G / (n*n);
-	col.B = col.B / (n*n);
+		
+		// pixel color is the average of all sub pixel colors.
+		col.R = col.R / (n*n);
+		col.G = col.G / (n*n);
+		col.B = col.B / (n*n);
+	} else {
 	
     ///////////////////////////////////////////////////////////////////
     // TO DO - complete the code that should be in this loop to do the
@@ -744,32 +746,32 @@ int main(int argc, char *argv[])
     ///////////////////////////////////////////////////////////////////
 
     // the coordinates of a pixel in view coordinator
-	  /*
-    pc.px = cam->wl+(i+0.5)*du;
-    pc.py = cam->wt+(j+0.5)*dv;
-    pc.pz = cam->f;
-    pc.pw = 1.0;
+	 
+		pc.px = cam->wl+(i+0.5)*du;
+		pc.py = cam->wt+(j+0.5)*dv;
+		pc.pz = cam->f;
+		pc.pw = 1.0;
 
-    // the direction of a ray in view coordinator
-    d.px = pc.px-cam->e.px;
-    d.py = pc.py-cam->e.py;
-    d.pz = pc.pz-cam->e.pz;
-    d.pw = 0.0;
-    // convert to world-space
-    matVecMult(cam->C2W, &pc);
-    matVecMult(cam->C2W, &d);
-    //construct viewing ray
-    ray=newRay(&pc, &d);
+		// the direction of a ray in view coordinator
+		d.px = pc.px-cam->e.px;
+		d.py = pc.py-cam->e.py;
+		d.pz = pc.pz-cam->e.pz;
+		d.pw = 0.0;
+		// convert to world-space
+		matVecMult(cam->C2W, &pc);
+		matVecMult(cam->C2W, &d);
+		//construct viewing ray
+		ray=newRay(&pc, &d);
 
-    // initialize pixel colour
-    col.R=0.0;
-    col.G=0.0;
-    col.B=0.0;
+		// initialize pixel colour
+		col.R=0.0;
+		col.G=0.0;
+		col.B=0.0;
 
-    // call rayTrace
-    rayTrace(ray, 0, &col, NULL);
-    free(ray);
-	*/
+		// call rayTrace
+		rayTrace(ray, 0, &col, NULL);
+		free(ray);
+	}
     
     if (col.R <= 0) {
       rgbIm[(j*sx + i)*3] = background.R * 255;
