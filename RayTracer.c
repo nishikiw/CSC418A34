@@ -562,7 +562,7 @@ int main(int argc, char *argv[])
  struct point3D pc,d;		// Point structures to keep the coordinates of a pixel and
 				// the direction or a ray
  struct ray3D *ray;		// Structure to keep the ray from e to a pixel
- struct colourRGB col;		// Return colour for raytraced pixels
+ struct colourRGB col, sub_col;		// Return colour for raytraced pixels
  struct colourRGB background;   // Background colour
  int i,j;			// Counters for pixel coordinates
  unsigned char *rgbIm;
@@ -607,9 +607,9 @@ int main(int argc, char *argv[])
  //        for Assignment 4 you need to create your own
  //        *interesting* scene.
  ///////////////////////////////////////////////////
- //buildScene();		// Create a scene. This defines all the
+ buildScene();		// Create a scene. This defines all the
 			// objects in the world of the raytracer
- buildSceneA();
+ //buildSceneA();
 
  //////////////////////////////////////////
  // TO DO: For Assignment 3 you can use the setup
@@ -692,20 +692,65 @@ int main(int argc, char *argv[])
   fprintf(stderr,"%d/%d, ",j,sx);
   for (i=0;i<sx;i++)
   {
+	
+	// Divide the pixel into n by n subpixels.
+	int n = 2;
+	double sub_du = du/n;
+	double sub_dv = dv/n;
+	
+	col.R=0.0;
+    col.G=0.0;
+    col.B=0.0;
+	
+	// Generate n^2 rays to get the sum color.
+	for (int iter_v = 0; iter_v < n; iter_v++){
+		for (int iter_h = 0; iter_h < n; iter_h++){ 
+			pc.px = cam->wl + i*du + iter_h*sub_du + rand()/(RAND_MAX/sub_du);
+			pc.py = cam->wt + j*dv + iter_v*sub_dv + rand()/(RAND_MAX/sub_dv);
+			pc.pz = cam->f;
+			pc.pw = 1.0;
+			
+			d.px = pc.px-cam->e.px;
+			d.py = pc.py-cam->e.py;
+			d.pz = pc.pz-cam->e.pz;
+			d.pw = 0.0;
+			
+			matVecMult(cam->C2W, &pc);
+			matVecMult(cam->C2W, &d);
+			
+			ray=newRay(&pc, &d);
+			
+			sub_col.R=0.0;
+			sub_col.G=0.0;
+			sub_col.B=0.0;
+			
+			rayTrace(ray, 0, &sub_col, NULL);
+			free(ray);
+			
+			col.R += sub_col.R;
+			col.G += sub_col.G;
+			col.B += sub_col.B;
+		}
+	}
+	
+	// pixel color is the average of all sub pixel colors.
+	col.R = col.R / (n*n);
+	col.G = col.G / (n*n);
+	col.B = col.B / (n*n);
+	
     ///////////////////////////////////////////////////////////////////
     // TO DO - complete the code that should be in this loop to do the
     //         raytracing!
     ///////////////////////////////////////////////////////////////////
 
     // the coordinates of a pixel in view coordinator
-    // pc=*newPoint(cam->wl+(i+0.5)*du, cam->wt+(j+0.5)*dv, cam->f, 1.0);
+	  /*
     pc.px = cam->wl+(i+0.5)*du;
     pc.py = cam->wt+(j+0.5)*dv;
     pc.pz = cam->f;
     pc.pw = 1.0;
 
     // the direction of a ray in view coordinator
-    // d=*newPoint(pc.px-cam->e.px, pc.py-cam->e.py, pc.pz-cam->e.pz, 0.0);
     d.px = pc.px-cam->e.px;
     d.py = pc.py-cam->e.py;
     d.pz = pc.pz-cam->e.pz;
@@ -724,7 +769,8 @@ int main(int argc, char *argv[])
     // call rayTrace
     rayTrace(ray, 0, &col, NULL);
     free(ray);
-
+	*/
+    
     if (col.R <= 0) {
       rgbIm[(j*sx + i)*3] = background.R * 255;
       rgbIm[(j*sx + i)*3 + 1] = background.G * 255;
