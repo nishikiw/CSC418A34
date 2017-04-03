@@ -112,7 +112,7 @@ void buildScene(void)
  p.py=15.5;
  p.pz=-5.5;
  p.pw=1;
- l=newPLS(&p,.95/2,.95/2,.95/2);
+ l=newPLS(&p,.95,.95,.95);
  insertPLS(l,&light_list);
 
   // add an area light source
