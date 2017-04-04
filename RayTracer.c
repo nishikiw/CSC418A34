@@ -80,7 +80,7 @@ void buildScene(void)
  // o=newPlane(.05,.75, 0.0, 0.0,.55,.8,.75,1,1,2);
  
  Scale(o,6,6,1);				// Do a few transforms...
- RotateZ(o,PI/1.20);
+ //RotateZ(o,PI/1.20);
  RotateX(o,PI/2.25);
  Translate(o,0,-3,10);
  invert(&o->T[0][0],&o->Tinv[0][0]);		// Very important! compute
@@ -89,32 +89,42 @@ void buildScene(void)
  insertObject(o,&object_list);			// Insert into object list
 
  // Let's add a couple spheres
- o=newSphere(.05,.95,.35,.35,1,.25,.25,1,1,50);
+  o=newSphere(.05,.95,.35,.35,1,.25,.25,1,1,6);
  // for scene signature
  // o=newSphere(1.0, 0.0, 0.0, 0.0,1,.25,.25,1,1,50);
  // for diffuse and ambient
- // o=newSphere(.05,.95, 0.0, 0.0,1,.25,.25,1,1,50);
+ //o=newSphere(.05,.95, 0.0, 0.0,1,.25,.25,1,1,50);
  // for refraction
- //o=newSphere(.05,.95, 0.0, 0.0,1,.25,.25,0.8,0.5,50);
- Scale(o,.75,.5,1.5);
- RotateY(o,PI/2);
- Translate(o,-1.45,1.1,3.5);
+ //o=newSphere(0,.7,0.9,.9,0.1,.1,.1,0.1,1.33,96);
+ //Scale(o,.75,.5,1.5);
+ //RotateY(o,PI/2);
+ //Translate(o,-1.45,1.1,3.5);
+ Translate(o,0,-1.5,8);
  invert(&o->T[0][0],&o->Tinv[0][0]);
  insertObject(o,&object_list);
 
- o=newSphere(.05,.95,.95,.75,.75,.95,.55,1,1,50);
+ //o=newSphere(.05,.95,.95,.75,.75,.95,.55,1,1,6);
  // for signature
  // o=newSphere(1.0, 0.0, 0.0, 0.0,.75,.95,.55,1,1,50);
  // for ambient and signature
  // o=newSphere(.05,.95, 0.0, 0.0,.75,.95,.55,1,1,50);
  // for refraction
- //o=newSphere(.05,.95, 0.0, 0.0,1,.25,.25,0.2,0.5,50);
- Scale(o,.5,2.0,1.0);
- RotateZ(o,PI/1.5);
- Translate(o,1.75,1.25,5.0);
+ o=newSphere(0,.7,0.9,.95,    0.95,.95,.95,    0.1,1.33,96);
+ //Scale(o,0.5,0.5,0.5);
+ //RotateZ(o,PI/1.5);
+ //Translate(o,1.75,1.25,5.0);
+ Translate(o,0.5,-1,5);
  invert(&o->T[0][0],&o->Tinv[0][0]);
  insertObject(o,&object_list);
-
+	
+ o=newSphere(0.4,.7,0.9,.95,    0.35,.35,.95,    0.8,1.2,96);
+ Scale(o,0.5,0.5,0.5);
+ RotateZ(o,PI/1.5);
+ //Translate(o,1.75,1.25,5.0);
+ Translate(o,4,-2,7);
+ invert(&o->T[0][0],&o->Tinv[0][0]);
+ insertObject(o,&object_list);
+ 
  // Insert a single point light source.
  p.px=0;
  p.py=15.5;
@@ -376,6 +386,10 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
 
   if (depth < MAX_DEPTH){
    // Reflection ray.
+   struct colourRGB reflect_col;
+	reflect_col.R = 0;
+	reflect_col.G = 0;
+	reflect_col.B = 0;
    struct point3D *reflect_ray_p0 = newPoint(p->px, p->py, p->pz, 1);
    struct point3D *offset_n = newPoint(n->px/pow(2, 20), n->py/pow(2, 20), n->pz/pow(2, 20), 0);
    addVectors(offset_n, reflect_ray_p0);
@@ -384,14 +398,71 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
    struct point3D *reflect_ray_d = newPoint(2*vn*n->px - reversed_ray_d->px, 2*vn*n->py - reversed_ray_d->py, 2*vn*n->pz - reversed_ray_d->pz, 0.0);
    normalize(reflect_ray_d);
    struct ray3D *reflect_ray = newRay(reflect_ray_p0, reflect_ray_d);
-   rayTrace(reflect_ray, depth+1, col, obj);
+   
+   rayTrace(reflect_ray, depth+1, &reflect_col, obj);
+   
+   col->R = col->R + reflect_col.R * obj->alpha;
+	col->G = col->G + reflect_col.G * obj->alpha;
+	col->B = col->B + reflect_col.B * obj->alpha;
+   
    free(reflect_ray_p0);
    free(reflect_ray_d);
    free(reflect_ray);
    free(reversed_ray_d);
    free(offset_n);
+   
    // Refraction ray.
-    
+   if (obj->alpha < 1){
+	struct colourRGB refract_col;
+	refract_col.R = 0;
+	refract_col.G = 0;
+	refract_col.B = 0;
+	struct point3D *t_p0 = newPoint(p->px, p->py, p->pz, 1);
+	struct point3D *offset_neg_n = newPoint(-n->px/pow(2, 20), -n->py/pow(2, 20), -n->pz/pow(2, 20), 0);
+	addVectors(offset_neg_n, t_p0);
+	struct point3D *t_d = newPoint(1, 1, 1, 0);
+	getRefractionVector(obj->r_index, 1, &(ray->d), n, t_d);
+	struct ray3D *t_ray = newRay(t_p0, t_d);
+	
+	double t_lambda = -1;
+	struct point3D *out_p = newPoint(1,1,1,1);
+	struct point3D *out_n = newPoint(1,1,1,0);
+	obj->intersect(obj, t_ray, &t_lambda, out_p, out_n, &a, &b);
+	
+	if (t_lambda < 0){
+		printf("Refraction ray lambda < 0\n");
+		exit(0);
+	}
+	
+	// Add offset to out refraction ray p0
+	out_p->px = out_p->px + out_n->px/pow(2, 20);
+	out_p->py = out_p->py + out_n->py/pow(2, 20);
+	out_p->pz = out_p->pz + out_n->pz/pow(2, 20);
+	
+	struct point3D *neg_out_n = newPoint(-out_n->px, -out_n->py, -out_n->pz, 0);
+
+	struct point3D *out_d1 = newPoint(1, 1, 1, 0);
+	getRefractionVector(1, obj->r_index, t_d, neg_out_n, out_d1);
+	
+	if (dot(out_n, out_d1) >= 0){
+		struct ray3D *out_ray1 = newRay(out_p, out_d1);
+	
+		rayTrace(out_ray1, depth+1, &refract_col, obj);
+		
+		col->R = col->R + refract_col.R * (1-obj->alpha);
+		col->G = col->G + refract_col.G * (1-obj->alpha);
+		col->B = col->B + refract_col.B * (1-obj->alpha);
+		free(out_ray1);
+	}
+	free(t_p0);
+	free(offset_neg_n);
+	free(t_d);
+	free(t_ray);
+	free(out_p);
+	free(out_n);
+	free(neg_out_n);
+	free(out_d1);
+   }
   }
 
  }
@@ -404,6 +475,42 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
  
  return;
 
+}
+
+
+void getRefractionVector(double nt, double n, struct point3D *d, struct point3D *normal, struct point3D *t){
+	
+	normalize(d);
+	normalize(normal);
+	
+	//printf("\nnt = %f, n = %f, d = (%f, %f, %f), normal = (%f, %f, %f)\n", nt, n, d->px, d->py, d->pz, normal->px, normal->py, normal->pz);
+	
+	t->px = d->px;
+	t->py = d->py;
+	t->pz = d->pz;
+	
+	double d_dot_n = dot(t, normal);
+	struct point3D *n_times_d_dot_n = newPoint(normal->px * d_dot_n, normal->py * d_dot_n, normal->pz * d_dot_n, 0);
+	
+	subVectors(n_times_d_dot_n, t);
+	
+	t->px = t->px * n / nt;
+	t->py = t->py * n / nt;
+	t->pz = t->pz *n / nt;
+	
+	double mult = sqrt(1 - n * n * (1 - d_dot_n * d_dot_n)/(nt * nt));
+	struct point3D *vec2 = newPoint(normal->px * mult, normal->py * mult, normal->pz * mult, 0);
+	
+	subVectors(vec2, t);
+	
+	normalize(t);
+	
+	free(n_times_d_dot_n);
+	free(vec2);
+	
+	//printf("t = (%f, %f, %f)\n----------------------------------\n", t->px, t->py, t->pz);
+	
+	return;
 }
 
 void phongIllumination(struct pointLS *light, struct ray3D *ray, struct ray3D *light_ray, struct object3D *obj, struct point3D *p, struct point3D *n, struct colourRGB *col)
