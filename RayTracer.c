@@ -170,6 +170,7 @@ void buildSceneA(void)
  // Let's add a plane placed on the bottom
  // Note the parameters: ra, rd, rs, rg, R, G, B, alpha, r_index, and shinyness)
  o=newPlane(.05,.75,.05,.05,.55,.8,.75,1,1,2);  // Note the plane is highly-reflective (rs=rg=.75) so we
+ //o=newPlane(.25,.25,.05,.05,.25,.25,.25,1,1,2);           
             // should see some reflections if all is done properly.
             // Colour is close to cyan, and currently the plane is
             // completely opaque (alpha=1). The refraction index is
@@ -189,7 +190,7 @@ void buildSceneA(void)
  RotateY(o, PI/2);
  Translate(o,-4.8, 0.0, 8);
  invert(&o->T[0][0],&o->Tinv[0][0]);    // Very important! compute
- loadTexture(o, "mandrill.ppm");
+ //loadTexture(o, "mandrill.ppm");
  insertObject(o,&object_list);      // Insert into object list
 
  // add another plane placed on the right side
@@ -199,7 +200,7 @@ void buildSceneA(void)
  RotateY(o, -PI/2);
  Translate(o, 4.8, 0.0, 8);
  invert(&o->T[0][0],&o->Tinv[0][0]);    // Very important! compute
- loadTexture(o, "mandrill.ppm");
+ //loadTexture(o, "mandrill.ppm");
  insertObject(o,&object_list);      // Insert into object list
 
  // Let's add another plane with texture colours on the far side
@@ -211,12 +212,11 @@ void buildSceneA(void)
  Translate(o,0,0,28);
  invert(&o->T[0][0],&o->Tinv[0][0]);    // Very important! compute
  // add texture
- // loadTexture(o, "mcfaddin_2.ppm");
+ //loadTexture(o, "mcfaddin_2.ppm");
  insertObject(o,&object_list);      // Insert into object list
 
  o=newPlane(.05,.75,.05,.05,.55,.8,.75, 0.0,1,2);  // Note the plane is highly-reflective (rs=rg=.75)
  Scale(o,8,8,1);        // Do a few transforms...
- //RotateZ(o,PI/1.20);
  RotateX(o,PI);
  Translate(o,0,2,27.9);
  invert(&o->T[0][0],&o->Tinv[0][0]);    // Very important! compute
@@ -241,36 +241,38 @@ void buildSceneA(void)
  loadTexture(o, "mandrill.ppm");
  insertObject(o,&object_list);
 
- o=newSphere(.05,.95,.95,.75,.95,.10,.10,1,1,50);
- Scale(o, 0.5, 0.5, 0.5);
- RotateX(o,PI/2);
- Translate(o, 4.3, -4.3, 8.0);
- invert(&o->T[0][0],&o->Tinv[0][0]);
- loadTexture(o, "mcfaddin_2.ppm");
- insertObject(o,&object_list);
+ // o=newSphere(.05,.95,.95,.75,.95,.10,.10,1,1,50);
+ // Scale(o, 0.5, 0.5, 0.5);
+ // RotateX(o,PI/2);
+ // Translate(o, 4.3, -4.3, 8.0);
+ // invert(&o->T[0][0],&o->Tinv[0][0]);
+ // loadTexture(o, "mcfaddin_2.ppm");
+ // insertObject(o,&object_list);
 
- o=newSphere(.05,.95,.95,.75,.10,.95,.10,1,1,50);
- Scale(o, 0.5, 0.5, 0.5);
- RotateX(o,PI/2);
- Translate(o, 4.3, -4.3, 7.0);
- invert(&o->T[0][0],&o->Tinv[0][0]);
- loadTexture(o, "mandrill.ppm");
- insertObject(o,&object_list);
+ // o=newSphere(.05,.95,.95,.75,.10,.95,.10,1,1,50);
+ // Scale(o, 0.5, 0.5, 0.5);
+ // RotateX(o,PI/2);
+ // Translate(o, 4.3, -4.3, 7.0);
+ // invert(&o->T[0][0],&o->Tinv[0][0]);
+ // loadTexture(o, "mandrill.ppm");
+ // insertObject(o,&object_list);
 
- o=newSphere(.05,.95,.95,.75,.10,.10,.95,1,1,50);
+ o=newSphere(.55,.95,.95,.05,.10,.10,.95,1,1,50);
  Scale(o, 0.5, 0.5, 0.5);
  RotateX(o,PI/2);
  Translate(o, 4.3, -4.3, 6.0);
  invert(&o->T[0][0],&o->Tinv[0][0]);
- loadTexture(o, "mcfaddin_2.ppm");
+ //loadTexture(o, "mcfaddin_2.ppm");
+ loadTexture(o, "Earth-is-flat.ppm");
  insertObject(o,&object_list);
 
- o=newSphere(.05,.95,.95,.75,.10,.10,.95,1,1,50);
+ o=newSphere(.95,.95,.95,.01,.95,.95,.95,1,1,50);
  Scale(o, 1.0, 1.0, 1.0);
  RotateX(o,PI/2);
- Translate(o, 0.0, -4.3, 6.0);
+ RotateY(o,PI); 
+ Translate(o, 0.0, -3.0, 5.0);
  invert(&o->T[0][0],&o->Tinv[0][0]);
- loadTexture(o, "mcfaddin_2.ppm");
+ loadTexture(o, "Earth-is-flat.ppm");
  insertObject(o,&object_list);
 
 
@@ -278,7 +280,6 @@ void buildSceneA(void)
   addAreaLight(0.5, 0.5, 0.0, 1.0, 0.0,\
                   0.5, 15.5, -5.5, 1, 1,\
                   0.95, 0.95, 0.95, &object_list, &light_list);
-
 
  // End of simple scene for Assignment 3
  // Keep in mind that you can define new types of objects such as cylinders and parametric surfaces,
@@ -388,7 +389,7 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
  free(first_hit_p);
  free(first_hit_n);
  free(phong_col);
- 
+
  return;
 
 }
@@ -404,7 +405,7 @@ void phongIllumination(struct pointLS *light, struct ray3D *ray, struct ray3D *l
 	 * n: the normal at intersection point
 	 * col: the RETURN colour
 	 */
-	
+
 	struct point3D *L = newPoint(light_ray->d.px, light_ray->d.py, light_ray->d.pz, 0.0);
 	struct point3D *N = newPoint(n->px, n->py, n->pz, 0.0);
 	struct point3D *V = newPoint(-ray->d.px, -ray->d.py, -ray->d.pz, 0.0);
@@ -480,7 +481,6 @@ void findFirstHit(struct ray3D *ray, double *lambda, struct object3D *Os, struct
   	}
     cur_obj=cur_obj->next;
   }
-  
   return;
 }
 
@@ -497,7 +497,7 @@ void rayTrace(struct ray3D *ray, int depth, struct colourRGB *col, struct object
  // it will correspond to the object from which the recursive
  // ray originates.
  //
-
+  
  double lambda;		// Lambda at intersection
  double a,b;		// Texture coordinates
  struct object3D *obj;	// Pointer to object at intersection

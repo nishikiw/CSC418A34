@@ -321,17 +321,31 @@ void sphereIntersect(struct object3D *sphere, struct ray3D *ray, double *lambda,
   if (sphere->texImg != NULL){
     //printf("TODO Part4: intersection on texture\n");
     theta = acos(p->pz);
-    phi = atan(p->py/p->px);
-    if (p->px>0 && p->py>0) {
-    	*a = (2*PI-phi)/(2*PI);
+    //phi = atan(p->py/p->px);
+    if (p->px==0 && p->py>0) {
+      phi = PI/2.0;
+    }
+    else if (p->px==0 && p->py<0) {
+      phi = 3.0*PI/2.0;
+    }
+    else {
+      phi = atan(p->py/p->px);
+    }
+
+    if (p->px>0 && p->py>=0) {
+      *a = phi/(2*PI);
     }
     if (p->px<0) {
-    	*a = (PI-phi)/(2*PI);
+      *a = (PI+phi)/(2*PI);
     }
     if (p->px>0 && p->py<0) {
-    	*a = (-phi)/(2*PI);
+      *a = (2*PI+phi)/(2*PI);
     }
-    *b = (PI-theta)/PI;
+    double sub_result = PI - theta;
+    if (sub_result < 0){
+      sub_result = 0;
+    }
+    *b = sub_result/PI;
   }
 	
 	point3D *n_orig = newPoint(p->px, p->py, p->pz, 0);
@@ -389,15 +403,26 @@ void texMap(struct image *img, double a, double b, double *R, double *G, double 
   double up, vp;
   double *rgbIm;
 
+  //printf("start texmap\n");
+
   rgbIm=(double *)img->rgbdata;
+  //printf("rgbdata size=%d\n", (int) (sizeof(img->rgbdata)/sizeof(double)/3));
   i = floor(a*img->sx);
   j = floor(b*img->sy);
   up = a*img->sx - i;
   vp = b*img->sy - j;
+  //printf("a = %f, b = %f, i = %d, j = %d\n", a, b, i, j);
+
+  // *R = (1-up)*(1-vp)*rgbIm[(j*img->sx+i)*3] + \
+  //      up*(1-vp)*rgbIm[((j+1)*img->sx+i)*3] + \
+  //      (1-up)*vp*rgbIm[(j*img->sx+i+1)*3] + \
+  //      up*vp*rgbIm[((j+1)*img->sx+i+1)*3];
+  //printf("sx=%d, sy=%d, mult=%d\n", img->sx, img->sy, img->sx * img->sy);
   *R = (1-up)*(1-vp)*rgbIm[(j*img->sx+i)*3] + \
        up*(1-vp)*rgbIm[((j+1)*img->sx+i)*3] + \
        (1-up)*vp*rgbIm[(j*img->sx+i+1)*3] + \
        up*vp*rgbIm[((j+1)*img->sx+i+1)*3];
+  //printf("c\n");
   *G = (1-up)*(1-vp)*rgbIm[(j*img->sx+i)*3 + 1] + \
        up*(1-vp)*rgbIm[((j+1)*img->sx+i)*3 +1] + \
        (1-up)*vp*rgbIm[(j*img->sx+i+1)*3 + 1] + \
@@ -406,6 +431,8 @@ void texMap(struct image *img, double a, double b, double *R, double *G, double 
        up*(1-vp)*rgbIm[((j+1)*img->sx+i)*3 + 2] + \
        (1-up)*vp*rgbIm[(j*img->sx+i+1)*3 + 2] + \
        up*vp*rgbIm[((j+1)*img->sx+i+1)*3 + 2];
+
+  //printf("end texmap\n");
 
  // *(R)=0;	// Returns black - delete this and
  // *(G)=0;	// replace with your code to compute
