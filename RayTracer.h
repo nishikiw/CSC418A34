@@ -18,7 +18,7 @@
 #ifndef __RayTracer_header
 #define __RayTracer_header
 
-#define PI 3.14159265354
+#define PI 3.14159265355
 /* The structure below is used to hold a single RGB image */
 struct image{
 	void *rgbdata;

@@ -246,7 +246,13 @@ void planeIntersect(struct object3D *plane, struct ray3D *ray, double *lambda, s
     if (plane->texImg != NULL){
       //printf("TODO Part4: intersection on texture\n");
       *a = (p->px+1.0)/2.0;
+      if (*a<0){
+        *a=0;
+      }
       *b = (p->py+1.0)/2.0;
+      if (*b<0) {
+        b=0;
+      }
     }
     
 		memcpy(lambda, &t, sizeof(double));
@@ -334,6 +340,9 @@ void sphereIntersect(struct object3D *sphere, struct ray3D *ray, double *lambda,
     }
 
     if (p->px>0 && p->py>=0) {
+      if (phi<0) {
+        phi=0;
+      }
       *a = phi/(2*PI);
     }
     if (p->px<0) {
@@ -342,11 +351,23 @@ void sphereIntersect(struct object3D *sphere, struct ray3D *ray, double *lambda,
     if (p->px>0 && p->py<0) {
       *a = (2*PI+phi)/(2*PI);
     }
+    if (*a<0) {
+      *a=0;
+    }
+    if (*a>1) {
+      *a=1;
+    }
     double sub_result = PI - theta;
     if (sub_result < 0){
       sub_result = 0;
     }
     *b = sub_result/PI;
+    if (*b<0) {
+      b=0;
+    }
+    if (*b>1) {
+      *b=1;
+    }
   }
 	
 	point3D *n_orig = newPoint(p->px, p->py, p->pz, 0);
@@ -412,6 +433,7 @@ void texMap(struct image *img, double a, double b, double *R, double *G, double 
   j = floor(b*img->sy);
   up = a*img->sx - i;
   vp = b*img->sy - j;
+
   //printf("a = %f, b = %f, i = %d, j = %d\n", a, b, i, j);
 
   // *R = (1-up)*(1-vp)*rgbIm[(j*img->sx+i)*3] + \

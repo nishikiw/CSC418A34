@@ -32,61 +32,62 @@ int MAX_DEPTH;
 // the original scene of assignment
 void buildScene(void)
 {
- // Sets up all objects in the scene. This involves creating each object,
- // defining the transformations needed to shape and position it as
- // desired, specifying the reflectance properties (albedos and colours)
- // and setting up textures where needed.
- // Light sources must be defined, positioned, and their colour defined.
- // All objects must be inserted in the object_list. All light sources
- // must be inserted in the light_list.
- //
- // To create hierarchical objects:
- //   Copy the transform matrix from the parent node to the child, and
- //   apply any required transformations afterwards.
- //
- // NOTE: After setting up the transformations for each object, don't
- //       forget to set up the inverse transform matrix!
+  // Sets up all objects in the scene. This involves creating each object,
+  // defining the transformations needed to shape and position it as
+  // desired, specifying the reflectance properties (albedos and colours)
+  // and setting up textures where needed.
+  // Light sources must be defined, positioned, and their colour defined.
+  // All objects must be inserted in the object_list. All light sources
+  // must be inserted in the light_list.
+  //
+  // To create hierarchical objects:
+  //   Copy the transform matrix from the parent node to the child, and
+  //   apply any required transformations afterwards.
+  //
+  // NOTE: After setting up the transformations for each object, don't
+  //       forget to set up the inverse transform matrix!
 
- struct object3D *o;
- struct pointLS *l;
- struct point3D p;
+  struct object3D *o;
+  struct pointLS *l;
+  struct point3D p;
 
- ///////////////////////////////////////
- // TO DO: For Assignment 3 you have to use
- //        the simple scene provided
- //        here, but for Assignment 4 you
- //        *MUST* define your own scene.
- //        Part of your mark will depend
- //        on how nice a scene you
- //        create. Use the simple scene
- //        provided as a sample of how to
- //        define and position objects.
- ///////////////////////////////////////
+  ///////////////////////////////////////
+  // TO DO: For Assignment 3 you have to use
+  //        the simple scene provided
+  //        here, but for Assignment 4 you
+  //        *MUST* define your own scene.
+  //        Part of your mark will depend
+  //        on how nice a scene you
+  //        create. Use the simple scene
+  //        provided as a sample of how to
+  //        define and position objects.
+  ///////////////////////////////////////
 
- // Simple scene for Assignment 3:
- // Insert a couple of objects. A plane and two spheres
- // with some transformations.
+  // Simple scene for Assignment 3:
+  // Insert a couple of objects. A plane and two spheres
+  // with some transformations.
 
- // Let's add a plane
- // Note the parameters: ra, rd, rs, rg, R, G, B, alpha, r_index, and shinyness)
- o=newPlane(.05,.75,.05,.05,.55,.8,.75,1,1,2, 0.5);	// Note the plane is highly-reflective (rs=rg=.75) so we
-						// should see some reflections if all is done properly.
-						// Colour is close to cyan, and currently the plane is
-						// completely opaque (alpha=1). The refraction index is
-						// meaningless since alpha=1
- // for scene signature
- // o=newPlane(1.0, 0.0, 0.0, 0.0,.55,.8,.75,1,1,2);
- // for diffuse and ambient
- // o=newPlane(.05,.75, 0.0, 0.0,.55,.8,.75,1,1,2);
- 
- Scale(o,6,6,1);				// Do a few transforms...
- //RotateZ(o,PI/1.20);
- RotateX(o,PI/2.25);
- Translate(o,0,-3,10);
- invert(&o->T[0][0],&o->Tinv[0][0]);		// Very important! compute
-						// and store the inverse
-						// transform for this object!
- insertObject(o,&object_list);			// Insert into object list
+  // Let's add a plane
+  // Note the parameters: ra, rd, rs, rg, R, G, B, alpha, r_index, and shinyness)
+  o=newPlane(.05,.75,.05,.05,.55,.8,.75,1,1,2, 0.5);	// Note the plane is highly-reflective (rs=rg=.75) so we
+  					// should see some reflections if all is done properly.
+  					// Colour is close to cyan, and currently the plane is
+  					// completely opaque (alpha=1). The refraction index is
+  					// meaningless since alpha=1
+  // for scene signature
+  // o=newPlane(1.0, 0.0, 0.0, 0.0,.55,.8,.75,1,1,2);
+  // for diffuse and ambient
+  // o=newPlane(.05,.75, 0.0, 0.0,.55,.8,.75,1,1,2);
+
+  Scale(o,6,6,1);				// Do a few transforms...
+  //RotateZ(o,PI/1.20);
+  RotateX(o,-PI/1.85);
+  Translate(o,0,-3,10);
+  invert(&o->T[0][0],&o->Tinv[0][0]);		// Very important! compute
+  					// and store the inverse
+  					// transform for this object!
+  loadTexture(o, "./textures/plane_wood2.ppm");
+  insertObject(o,&object_list);			// Insert into object list
 
   // Let's add a couple spheres
   o=newSphere(.05,.95,.35,.35,1,.25,.25,1,1,6, 0.5);
@@ -101,21 +102,23 @@ void buildScene(void)
   //Translate(o,-1.45,1.1,3.5);
   Translate(o,0,-1.5,8);
   invert(&o->T[0][0],&o->Tinv[0][0]);
+  loadTexture(o, "./textures/sphere_candy.ppm");
   insertObject(o,&object_list);
 
-  o=newSphere(.05,.95,.95,.75,.75,.95,.55,1,1, 6, 0.5);
+  o=newSphere(.05,.95,.95,.15,.75,.95,.55,1,1, 6, 0.5);
   //o=newSphere(.05,.95,.95,.75,.75,.95,.55,1,1,6);
   // for signature
   // o=newSphere(1.0, 0.0, 0.0, 0.0,.75,.95,.55,1,1,50);
   // for ambient and signature
   // o=newSphere(.05,.95, 0.0, 0.0,.75,.95,.55,1,1,50);
   // for refraction
-  o=newSphere(0,.7,0.9,.95,    0.95,.95,.95,    0.1,1.33,96, 0.5);
+  // o=newSphere(0,.7,0.9,.95,    0.95,.95,.95,    0.1,1.33,96, 0.5);
   //Scale(o,0.5,0.5,0.5);
   //RotateZ(o,PI/1.5);
   //Translate(o,1.75,1.25,5.0);
-  Translate(o,0.5,-1,5);
+  Translate(o,-2.5,-1,5);
   invert(&o->T[0][0],&o->Tinv[0][0]);
+  loadTexture(o, "./textures/sphere_cherryblossom.ppm");
   insertObject(o,&object_list);
 
   o=newSphere(0.4,.7,0.9,.95,    0.35,.35,.95,    0.8,1.2,96, 0.5);
@@ -124,6 +127,7 @@ void buildScene(void)
   //Translate(o,1.75,1.25,5.0);
   Translate(o,4,-2,7);
   invert(&o->T[0][0],&o->Tinv[0][0]);
+  loadTexture(o, "./textures/sphere_pattern1.ppm");
   insertObject(o,&object_list);
 
   // Insert a single point light source.
@@ -471,7 +475,7 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
       // end of Glossy Reflection rays
 
    
-      // Refraction ray.
+      // Refraction ray for A4
       if (obj->alpha < 1){
         struct colourRGB refract_col;
         refract_col.R = 0;
