@@ -112,7 +112,7 @@ struct object3D{
 	double  alpha;		// Opacity - if less than 1 this is a semi
 				// transparent object and refraction rays
 				// should be implemented
-	double  r_index;		// Index of refraction
+	double  r_index;		// Index of refraction. n = 1, n_t = r_index
     double  shinyness;	// Exponent for the Phong specular component
     double  roughness;  
 	int 	frontAndBack;	// Flag to indicate that both sides of the object
@@ -152,5 +152,6 @@ void rayTrace(struct ray3D *ray, int depth, struct colourRGB *col, struct object
 void findFirstHit(struct ray3D *ray, double *lambda, struct object3D *Os, struct object3D **obj, struct point3D *p, struct point3D *n, double *a, double *b);
 void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n,struct ray3D *ray, int depth, double a, double b, struct colourRGB *col);
 void phongIllumination(struct pointLS *light, struct ray3D *ray, struct ray3D *light_ray, struct object3D *obj, struct point3D *p, struct point3D *n, struct colourRGB *col);	// Calculate the phong illumination value
+void getRefractionVector(double nt, double n, struct point3D *d, struct point3D *normal, struct point3D *t);	// Calculate the refraction ray t inside object
 
 #endif
