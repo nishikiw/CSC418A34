@@ -114,6 +114,7 @@ struct object3D{
 				// should be implemented
 	double  r_index;		// Index of refraction
     double  shinyness;	// Exponent for the Phong specular component
+    double  roughness;  
 	int 	frontAndBack;	// Flag to indicate that both sides of the object
 				// should be lit.
 	int	isLightSource;	// Flag to indicate if this is an area light source

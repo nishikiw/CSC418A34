@@ -112,7 +112,7 @@ inline void normalTransform(struct point3D *n_orig, struct point3D *n_transforme
 /////////////////////////////////////////////
 // Object management section
 /////////////////////////////////////////////
-struct object3D *newPlane(double ra, double rd, double rs, double rg, double r, double g, double b, double alpha, double r_index, double shiny)
+struct object3D *newPlane(double ra, double rd, double rs, double rg, double r, double g, double b, double alpha, double r_index, double shiny, double rough)
 {
  // Intialize a new plane with the specified parameters:
  // ra, rd, rs, rg - Albedos for the components of the Phong model
@@ -140,6 +140,7 @@ struct object3D *newPlane(double ra, double rd, double rs, double rg, double r, 
   plane->alpha=alpha;
   plane->r_index=r_index;
   plane->shinyness=shiny;
+  plane->roughness=rough;
   plane->intersect=&planeIntersect;
   plane->texImg=NULL;
   memcpy(&plane->T[0][0],&eye4x4[0][0],16*sizeof(double));
@@ -151,7 +152,7 @@ struct object3D *newPlane(double ra, double rd, double rs, double rg, double r, 
  return(plane);
 }
 
-struct object3D *newSphere(double ra, double rd, double rs, double rg, double r, double g, double b, double alpha, double r_index, double shiny)
+struct object3D *newSphere(double ra, double rd, double rs, double rg, double r, double g, double b, double alpha, double r_index, double shiny, double roughness)
 {
  // Intialize a new sphere with the specified parameters:
  // ra, rd, rs, rg - Albedos for the components of the Phong model
@@ -288,10 +289,10 @@ void sphereIntersect(struct object3D *sphere, struct ray3D *ray, double *lambda,
 	C = dot(&ray_transformed->p0, &ray_transformed->p0) - 1;
 	
 	// t2 >= t1
-	t = (-B - sqrt(B * B - 4 * A * C))/(2 * A);
-	//t2 = (-B + sqrt(B * B - 4 * A * C))/(2 * A);
+	t1 = (-B - sqrt(B * B - 4 * A * C))/(2 * A);
+	t2 = (-B + sqrt(B * B - 4 * A * C))/(2 * A);
 	
-	/* if (t1 < 0){
+	if (t1 < 0){
 		if (t2 < 0){
 			//printf("ERROR: SPHEREINTERSECT - invalid intersection.\n");
 			t = -1;
@@ -304,7 +305,7 @@ void sphereIntersect(struct object3D *sphere, struct ray3D *ray, double *lambda,
 	}
 	else{
 		t = t1;
-	} */
+	}
 
   // Invalid intersection.
   if (t < 0 || A == 0 || B * B - 4 * A * C < 0){
@@ -552,7 +553,7 @@ void addAreaLight(float sx, float sy, float nx, float ny, float nz,\
 	A2W[2][3]=tz;
 	A2W[3][3]=1;
 
-  o=newPlane(0.05, 0, 0, 0, 0.0, 0.0, 1.0, 1, 1, 2);
+  o=newPlane(0.05, 0, 0, 0, 0.0, 0.0, 1.0, 1, 1, 2, 0.5);
   o->isLightSource = 1;
   Scale(o, sx/2, sy/2, 1);
   matMult(A2W, o->T);

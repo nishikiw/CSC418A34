@@ -69,7 +69,7 @@ void buildScene(void)
 
  // Let's add a plane
  // Note the parameters: ra, rd, rs, rg, R, G, B, alpha, r_index, and shinyness)
- o=newPlane(.05,.75,.05,.05,.55,.8,.75,1,1,2);	// Note the plane is highly-reflective (rs=rg=.75) so we
+ o=newPlane(.05,.75,.05,.05,.55,.8,.75,1,1,2, 0.5);	// Note the plane is highly-reflective (rs=rg=.75) so we
 						// should see some reflections if all is done properly.
 						// Colour is close to cyan, and currently the plane is
 						// completely opaque (alpha=1). The refraction index is
@@ -78,6 +78,7 @@ void buildScene(void)
  // o=newPlane(1.0, 0.0, 0.0, 0.0,.55,.8,.75,1,1,2);
  // for diffuse and ambient
  // o=newPlane(.05,.75, 0.0, 0.0,.55,.8,.75,1,1,2);
+ 
  Scale(o,6,6,1);				// Do a few transforms...
  RotateZ(o,PI/1.20);
  RotateX(o,PI/2.25);
@@ -88,22 +89,26 @@ void buildScene(void)
  insertObject(o,&object_list);			// Insert into object list
 
  // Let's add a couple spheres
- o=newSphere(.05,.95,.35,.35,1,.25,.25,1,1,50);
+ o=newSphere(.05,.95,.35,.35,1,.25,.25,1,1,50, 0.5);
  // for scene signature
  // o=newSphere(1.0, 0.0, 0.0, 0.0,1,.25,.25,1,1,50);
  // for diffuse and ambient
  // o=newSphere(.05,.95, 0.0, 0.0,1,.25,.25,1,1,50);
+ // for refraction
+ //o=newSphere(.05,.95, 0.0, 0.0,1,.25,.25,0.8,0.5,50);
  Scale(o,.75,.5,1.5);
  RotateY(o,PI/2);
  Translate(o,-1.45,1.1,3.5);
  invert(&o->T[0][0],&o->Tinv[0][0]);
  insertObject(o,&object_list);
 
- o=newSphere(.05,.95,.95,.75,.75,.95,.55,1,1,50);
+ o=newSphere(.05,.95,.95,.75,.75,.95,.55,1,1,50, 0.5);
  // for signature
  // o=newSphere(1.0, 0.0, 0.0, 0.0,.75,.95,.55,1,1,50);
  // for ambient and signature
  // o=newSphere(.05,.95, 0.0, 0.0,.75,.95,.55,1,1,50);
+ // for refraction
+ //o=newSphere(.05,.95, 0.0, 0.0,1,.25,.25,0.2,0.5,50);
  Scale(o,.5,2.0,1.0);
  RotateZ(o,PI/1.5);
  Translate(o,1.75,1.25,5.0);
@@ -169,7 +174,7 @@ void buildSceneA(void)
 
  // Let's add a plane placed on the bottom
  // Note the parameters: ra, rd, rs, rg, R, G, B, alpha, r_index, and shinyness)
- o=newPlane(.05,.75,.05,.05,.55,.8,.75,1,1,2);  // Note the plane is highly-reflective (rs=rg=.75) so we
+ o=newPlane(.05,.75,.05,.05,.55,.8,.75,1,1,2, 0.5);  // Note the plane is highly-reflective (rs=rg=.75) so we
  //o=newPlane(.25,.25,.05,.05,.25,.25,.25,1,1,2);           
             // should see some reflections if all is done properly.
             // Colour is close to cyan, and currently the plane is
@@ -184,7 +189,7 @@ void buildSceneA(void)
  insertObject(o,&object_list);      // Insert into object list
 
  // add another plane placed on the left side
- o=newPlane(.05,.75,.05,.05,.55,.8,.75,1,1,2);  // Note the plane is highly-reflective (rs=rg=.75) so we
+ o=newPlane(.05,.75,.05,.05,.55,.8,.75,1,1,2, 0.5);  // Note the plane is highly-reflective (rs=rg=.75) so we
  Scale(o, 3.2, 4.8,1);        // Do a few transforms...
  RotateX(o, PI);
  RotateY(o, PI/2);
@@ -194,7 +199,7 @@ void buildSceneA(void)
  insertObject(o,&object_list);      // Insert into object list
 
  // add another plane placed on the right side
- o=newPlane(.05,.75,.05,.05,.55,.8,.75,1,1,2);  // Note the plane is highly-reflective (rs=rg=.75) so we
+ o=newPlane(.05,.75,.05,.05,.55,.8,.75,1,1,2, 0.5);  // Note the plane is highly-reflective (rs=rg=.75) so we
  Scale(o, 3.2, 4.8,1);        // Do a few transforms...
  RotateX(o, PI);
  RotateY(o, -PI/2);
@@ -205,7 +210,7 @@ void buildSceneA(void)
 
  // Let's add another plane with texture colours on the far side
  // Note the parameters: ra, rd, rs, rg, R, G, B, alpha, r_index, and shinyness)
- o=newPlane(.05,.75,.05,.05,.55,.8,.75, 0.0,1,2);  // Note the plane is highly-reflective (rs=rg=.75)
+ o=newPlane(.05,.75,.05,.05,.55,.8,.75, 0.0,1,2, 0.5);  // Note the plane is highly-reflective (rs=rg=.75)
  Scale(o,12,12,1);        // Do a few transforms...
  //RotateZ(o,PI/1.20);
  RotateX(o,PI);
@@ -215,7 +220,7 @@ void buildSceneA(void)
  //loadTexture(o, "mcfaddin_2.ppm");
  insertObject(o,&object_list);      // Insert into object list
 
- o=newPlane(.05,.75,.05,.05,.55,.8,.75, 0.0,1,2);  // Note the plane is highly-reflective (rs=rg=.75)
+ o=newPlane(.05,.75,.05,.05,.55,.8,.75, 0.0,1,2, 0.5);  // Note the plane is highly-reflective (rs=rg=.75)
  Scale(o,8,8,1);        // Do a few transforms...
  RotateX(o,PI);
  Translate(o,0,2,27.9);
@@ -225,7 +230,7 @@ void buildSceneA(void)
  insertObject(o,&object_list);      // Insert into object list
 
  // Let's add a couple spheres
- o=newSphere(.05,.95,.35,.35,1,.25,.25,1,1,50);
+ o=newSphere(.05,.95,.35,.35,1,.25,.25,1,1,50, 0.5);
  Scale(o,.4,.25,0.8);
  RotateY(o,PI/2);
  Translate(o,-1.3,1.0,3.5);
@@ -233,7 +238,7 @@ void buildSceneA(void)
  loadTexture(o, "mandrill.ppm");
  insertObject(o,&object_list);
 
- o=newSphere(.05,.95,.95,.75,.75,.95,.55,1,1,50);
+ o=newSphere(.05,.95,.95,.75,.75,.95,.55,1,1,50, 0.5);
  Scale(o,.25,1.0,0.5);
  RotateZ(o,PI/1.5);
  Translate(o,1.6,1.1,5.0);
@@ -241,7 +246,7 @@ void buildSceneA(void)
  loadTexture(o, "mandrill.ppm");
  insertObject(o,&object_list);
 
- // o=newSphere(.05,.95,.95,.75,.95,.10,.10,1,1,50);
+ // o=newSphere(.05,.95,.95,.75,.95,.10,.10,1,1,50, 0.5);
  // Scale(o, 0.5, 0.5, 0.5);
  // RotateX(o,PI/2);
  // Translate(o, 4.3, -4.3, 8.0);
@@ -249,7 +254,7 @@ void buildSceneA(void)
  // loadTexture(o, "mcfaddin_2.ppm");
  // insertObject(o,&object_list);
 
- // o=newSphere(.05,.95,.95,.75,.10,.95,.10,1,1,50);
+ // o=newSphere(.05,.95,.95,.75,.10,.95,.10,1,1,50, 0.5);
  // Scale(o, 0.5, 0.5, 0.5);
  // RotateX(o,PI/2);
  // Translate(o, 4.3, -4.3, 7.0);
@@ -257,7 +262,7 @@ void buildSceneA(void)
  // loadTexture(o, "mandrill.ppm");
  // insertObject(o,&object_list);
 
- o=newSphere(.55,.95,.95,.05,.10,.10,.95,1,1,50);
+ o=newSphere(.55,.95,.95,.05,.10,.10,.95,1,1,50, 0.5);
  Scale(o, 0.5, 0.5, 0.5);
  RotateX(o,PI/2);
  Translate(o, 4.3, -4.3, 6.0);
@@ -266,7 +271,7 @@ void buildSceneA(void)
  loadTexture(o, "Earth-is-flat.ppm");
  insertObject(o,&object_list);
 
- o=newSphere(.95,.95,.95,.01,.95,.95,.95,1,1,50);
+ o=newSphere(.95,.95,.95,.01,.95,.95,.95,1,1,50, 0.5);
  Scale(o, 1.0, 1.0, 1.0);
  RotateX(o,PI/2);
  RotateY(o,PI); 
@@ -371,17 +376,114 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
   col->B = tmp_col.B;
 
   if (depth < MAX_DEPTH){
-   struct point3D *reflect_ray_p0 = p;
-   struct point3D *reversed_ray_d = newPoint(-ray->d.px, -ray->d.py, -ray->d.pz, 0);
-   double vn = dot(reversed_ray_d, n);
-   struct point3D *reflect_ray_d = newPoint(2*vn*n->px - reversed_ray_d->px, 2*vn*n->py - reversed_ray_d->py, 2*vn*n->pz - reversed_ray_d->pz, 0.0);
-   normalize(reflect_ray_d);
-   struct ray3D *reflect_ray = newRay(reflect_ray_p0, reflect_ray_d);
-   rayTrace(reflect_ray, depth+1, col, obj);
-   free(reflect_ray_d);
-   free(reflect_ray);
-   free(reversed_ray_d);
+
+    // // Single Reflection ray.
+    // struct point3D *reflect_ray_p0 = newPoint(p->px, p->py, p->pz, 1);
+    // struct point3D *offset_n = newPoint(n->px/pow(2, 20), n->py/pow(2, 20), n->pz/pow(2, 20), 0);
+    // addVectors(offset_n, reflect_ray_p0);
+    // struct point3D *reversed_ray_d = newPoint(-ray->d.px, -ray->d.py, -ray->d.pz, 0);
+    // double vn = dot(reversed_ray_d, n);
+    // struct point3D *reflect_ray_d = newPoint(2*vn*n->px - reversed_ray_d->px, 2*vn*n->py - reversed_ray_d->py, 2*vn*n->pz - reversed_ray_d->pz, 0.0);
+    // normalize(reflect_ray_d);
+    // struct ray3D *reflect_ray = newRay(reflect_ray_p0, reflect_ray_d);
+    // rayTrace(reflect_ray, depth+1, col, obj);
+    // free(reflect_ray_p0);
+    // free(reflect_ray_d);
+    // free(reflect_ray);
+    // free(reversed_ray_d);
+    // free(offset_n);
+    // // end of Single Reflection ray
+
+    // Glossy Reflection rays for A4
+    double theta, phi;
+    double x, y, z;
+    struct point3D *u, *v;
+    struct ray3D *glossy_ray;
+    struct point3D *glossy_ray_p0;
+    struct point3D *glossy_ray_d;
+    double A2W[4][4]; // Local to World conversion matrix 
+    struct colourRGB *glossy_col = (struct colourRGB *) malloc(sizeof(struct colourRGB));
+    int numGlossyRay = 9;
+    int i;
+
+    struct point3D *reflect_ray_p0 = newPoint(p->px, p->py, p->pz, 1);
+    struct point3D *offset_n = newPoint(n->px/pow(2, 20), n->py/pow(2, 20), n->pz/pow(2, 20), 0);
+    addVectors(offset_n, reflect_ray_p0);
+    struct point3D *reversed_ray_d = newPoint(-ray->d.px, -ray->d.py, -ray->d.pz, 0);
+    double vn = dot(reversed_ray_d, n);
+    struct point3D *reflect_ray_d = newPoint(2*vn*n->px - reversed_ray_d->px, 2*vn*n->py - reversed_ray_d->py, 2*vn*n->pz - reversed_ray_d->pz, 0.0);
+    normalize(reflect_ray_d);
+
+    u=cross(reflect_ray_d, n);
+    normalize(u);
+    v=cross(u, reflect_ray_d);
+    normalize(v);
+    // construct Area2World matrix
+    A2W[0][0]=u->px;
+    A2W[1][0]=u->py;
+    A2W[2][0]=u->pz;
+    A2W[3][0]=0;
+
+    A2W[0][1]=v->px;
+    A2W[1][1]=v->py;
+    A2W[2][1]=v->pz;
+    A2W[3][1]=0;
+
+    A2W[0][2]=reflect_ray_d->px;
+    A2W[1][2]=reflect_ray_d->py;
+    A2W[2][2]=reflect_ray_d->pz;
+    A2W[3][2]=0;
+
+    A2W[0][3]=reflect_ray_p0->px;
+    A2W[1][3]=reflect_ray_p0->py;
+    A2W[2][3]=reflect_ray_p0->pz;
+    A2W[3][3]=1;
+
+    for (i=0; i<numGlossyRay; i++) {
+      glossy_col->R = 0;
+      glossy_col->G = 0;
+      glossy_col->B = 0;
+      // Choose uniformly sampled random direction to send the ray
+      // theta = (PI/2)*random()*obj->roughness;
+      theta = (PI/2)*random();
+      phi = 2*PI*random();
+      x = sin(theta)*cos(phi);
+      y = sin(theta)*sin(phi);
+      z = cos(theta);
+
+      // ray direction in local coordinates
+      glossy_ray_d = newPoint(x, y, z, 0);  
+      // convert to global coordinates
+      matVecMult(A2W, glossy_ray_d);  
+      // check if the glossy_ray_d vector is below the surface
+      if (dot(glossy_ray_d, n) < 0) {
+        glossy_ray_d = newPoint(-x, -y, z, 0);
+      }
+      glossy_ray = newRay(reflect_ray_p0, reflect_ray_d);
+
+      rayTrace(glossy_ray, depth+1, glossy_col, obj);
+
+      col->R +=  glossy_col->R/numGlossyRay;
+      col->G +=  glossy_col->G/numGlossyRay;
+      col->B +=  glossy_col->B/numGlossyRay;
+    }
+
+    free(u);
+    free(v);
+    free(glossy_ray);
+    free(glossy_ray_p0);
+    free(glossy_ray_d);
+    free(glossy_col);
+    
+    free(reflect_ray_p0);
+    free(reflect_ray_d);
+    free(reversed_ray_d);
+    free(offset_n);
+    // end of Glossy Reflection rays
+
+    // Refraction ray.
   }
+
  }
 
  free(cur_shadow_ray_d);
