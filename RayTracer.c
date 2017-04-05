@@ -100,9 +100,9 @@ void buildScene(void)
   //Scale(o,.75,.5,1.5);
   //RotateY(o,PI/2);
   //Translate(o,-1.45,1.1,3.5);
-  Translate(o,0,-1.5,8);
+  Translate(o,0,-1.5,5);
   invert(&o->T[0][0],&o->Tinv[0][0]);
-  loadTexture(o, "./textures/sphere_candy.ppm");
+  loadTexture(o, "./textures/sphere_cherryblossom.ppm");
   insertObject(o,&object_list);
 
   o=newSphere(.05,.95,.95,.15,.75,.95,.55,1,1, 6, 0.5);
@@ -118,16 +118,16 @@ void buildScene(void)
   //Translate(o,1.75,1.25,5.0);
   Translate(o,-2.5,-1,5);
   invert(&o->T[0][0],&o->Tinv[0][0]);
-  loadTexture(o, "./textures/sphere_cherryblossom.ppm");
+  loadTexture(o, "./textures/sphere_pattern2.ppm");
   insertObject(o,&object_list);
 
   o=newSphere(0.4,.7,0.9,.95,    0.35,.35,.95,    0.8,1.2,96, 0.5);
   Scale(o,0.5,0.5,0.5);
   RotateZ(o,PI/1.5);
   //Translate(o,1.75,1.25,5.0);
-  Translate(o,4,-2,7);
+  Translate(o,2.5,-2,5);
   invert(&o->T[0][0],&o->Tinv[0][0]);
-  loadTexture(o, "./textures/sphere_pattern1.ppm");
+  loadTexture(o, "./textures/sphere_pattern3.ppm");
   insertObject(o,&object_list);
 
   // Insert a single point light source.
