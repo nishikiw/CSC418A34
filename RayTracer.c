@@ -79,7 +79,7 @@ void buildScene(void)
   // for diffuse and ambient
   // o=newPlane(.05,.75, 0.0, 0.0,.55,.8,.75,1,1,2);
 
-  Scale(o,6,6,1);				// Do a few transforms...
+  Scale(o,6,8,1);				// Do a few transforms...
   //RotateZ(o,PI/1.20);
   RotateX(o,-PI/1.85);
   Translate(o,0,-3,10);
@@ -100,7 +100,7 @@ void buildScene(void)
   //Scale(o,.75,.5,1.5);
   //RotateY(o,PI/2);
   //Translate(o,-1.45,1.1,3.5);
-  Translate(o,0,-1.5,5);
+  Translate(o,3.0,-1.5,10);
   invert(&o->T[0][0],&o->Tinv[0][0]);
   loadTexture(o, "./textures/sphere_cherryblossom.ppm");
   insertObject(o,&object_list);
@@ -116,7 +116,7 @@ void buildScene(void)
   //Scale(o,0.5,0.5,0.5);
   //RotateZ(o,PI/1.5);
   //Translate(o,1.75,1.25,5.0);
-  Translate(o,-2.5,-1,5);
+  Translate(o,-3.0,-1,5);
   invert(&o->T[0][0],&o->Tinv[0][0]);
   loadTexture(o, "./textures/sphere_pattern2.ppm");
   insertObject(o,&object_list);
@@ -125,18 +125,23 @@ void buildScene(void)
   Scale(o,0.5,0.5,0.5);
   RotateZ(o,PI/1.5);
   //Translate(o,1.75,1.25,5.0);
-  Translate(o,2.5,-2,5);
+  Translate(o,3.0,-2,5);
   invert(&o->T[0][0],&o->Tinv[0][0]);
   loadTexture(o, "./textures/sphere_pattern3.ppm");
   insertObject(o,&object_list);
 
   // Insert a single point light source.
-  p.px=0;
-  p.py=15.5;
-  p.pz=-5.5;
-  p.pw=1;
-  l=newPLS(&p,.95,.95,.95);
-  insertPLS(l,&light_list);
+  // p.px=0;
+  // p.py=15.5;
+  // p.pz=-5.5;
+  // p.pw=1;
+  // l=newPLS(&p,.95,.95,.95);
+  // insertPLS(l,&light_list);
+
+  // add an area light source
+  addAreaLight(1.5, 1.5, 0.0, 1.0, 0.0,\
+                  0.5, 5.0, 5.5, 1, 1,\
+                  0.95, 0.95, 0.95, &object_list, &light_list);
 
 
  // End of simple scene for Assignment 3
@@ -312,6 +317,15 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
   tmp_col.R=0;
   tmp_col.G=0;
   tmp_col.B=0;
+
+  // check if the obj is light source
+  if (obj->isLightSource==1)    // Not textured, use object colour
+  {
+  col->R=obj->col.R;
+  col->G=obj->col.G;
+  col->B=obj->col.B;
+  return;
+  }
 
   if (obj->texImg==NULL)		// Not textured, use object colour
   {
