@@ -419,12 +419,6 @@ void texMap(struct image *img, double a, double b, double *R, double *G, double 
   vp = b*img->sy - j;
 
   //printf("a = %f, b = %f, i = %d, j = %d\n", a, b, i, j);
-
-  // *R = (1-up)*(1-vp)*rgbIm[(j*img->sx+i)*3] + \
-  //      up*(1-vp)*rgbIm[((j+1)*img->sx+i)*3] + \
-  //      (1-up)*vp*rgbIm[(j*img->sx+i+1)*3] + \
-  //      up*vp*rgbIm[((j+1)*img->sx+i+1)*3];
-  //printf("sx=%d, sy=%d, mult=%d\n", img->sx, img->sy, img->sx * img->sy);
   *R = (1-up)*(1-vp)*rgbIm[(j*img->sx+i)*3] + \
        up*(1-vp)*rgbIm[((j+1)*img->sx+i)*3] + \
        (1-up)*vp*rgbIm[(j*img->sx+i+1)*3] + \

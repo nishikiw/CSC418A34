@@ -130,6 +130,64 @@ void buildScene(void)
   loadTexture(o, "./textures/sphere_pattern3.ppm");
   insertObject(o,&object_list);
 
+  // build a native symbol
+  o=newSphere(0.4,.7,0.9, .25, 0.55,.55,.35, 0.8,1.2,96, 0.5);
+  Scale(o,0.5,0.3,0.5);
+  Translate(o,-1.0, -3.5, 5);
+  invert(&o->T[0][0],&o->Tinv[0][0]);
+  insertObject(o,&object_list);
+
+  o=newSphere(0.4,.7,0.9, .25, 0.55,.55,.35, 0.8,1.2,96, 0.5);
+  Scale(o,0.5,0.3,0.5);
+  Translate(o, 1.0, -3.5, 5);
+  invert(&o->T[0][0],&o->Tinv[0][0]);
+  insertObject(o,&object_list);
+
+  o=newSphere(0.4,.7,0.9, .25, 0.55,.55,.55, 0.8,1.2,96, 0.5);
+  Scale(o,0.5,0.3,0.5);
+  Translate(o,-1.0, -2.9, 5);
+  invert(&o->T[0][0],&o->Tinv[0][0]);
+  insertObject(o,&object_list);
+
+  o=newSphere(0.4,.7,0.9, .25, 0.55,.55,.55, 0.8,1.2,96, 0.5);
+  Scale(o,0.5,0.3,0.5);
+  Translate(o, 1.0, -2.9, 5);
+  invert(&o->T[0][0],&o->Tinv[0][0]);
+  insertObject(o,&object_list);
+
+  o=newSphere(0.4,.7,0.9, .25, 0.55, .55, .55, 0.8,1.2,96, 0.5);
+  Scale(o,1.3, 0.5, 0.5);
+  Translate(o, 0.0, -2.1, 5);
+  invert(&o->T[0][0],&o->Tinv[0][0]);
+  loadTexture(o, "./textures/sphere_pattern2.ppm");
+  insertObject(o,&object_list);
+
+  o=newSphere(0.4,.7,0.9, .25, 0.35,.35,.35, 0.8,1.2,96, 0.5);
+  Scale(o, 0.7, 0.6, 0.5);
+  Translate(o, 0.0, -1.1, 5);
+  invert(&o->T[0][0],&o->Tinv[0][0]);
+  loadTexture(o, "./textures/sphere_pattern3.ppm");
+  insertObject(o,&object_list);
+
+  o=newSphere(0.4,.7,0.9, .25, 0.35,.35,.35, 0.8,1.2,96, 0.5);
+  Scale(o,1.9, 0.4, 0.4);
+  Translate(o, 0.0, -0.1, 5);
+  invert(&o->T[0][0],&o->Tinv[0][0]);
+  loadTexture(o, "./textures/sphere_cherryblossom.ppm");
+  insertObject(o,&object_list);
+
+  o=newSphere(0.4,.7,0.9, .25, 0.35,.35,.35, 0.8,1.2,96, 0.5);
+  Scale(o, 0.5, 0.6, 0.5);
+  Translate(o, 0.0, 0.8, 5);
+  invert(&o->T[0][0],&o->Tinv[0][0]);
+  loadTexture(o, "./textures/sphere_crystal.ppm");
+  insertObject(o,&object_list);
+
+  
+
+
+
+
   // Insert a single point light source.
   // p.px=0;
   // p.py=15.5;
@@ -140,7 +198,7 @@ void buildScene(void)
 
   // add an area light source
   addAreaLight(1.5, 1.5, 0.0, 1.0, 0.0,\
-                  0.5, 5.0, 5.5, 1, 1,\
+                  0.5, 10.0, -5.0, 1, 1,\
                   0.95, 0.95, 0.95, &object_list, &light_list);
 
 
@@ -410,7 +468,7 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
       struct point3D *glossy_ray_d;
       double A2W[4][4]; // Local to World conversion matrix 
       struct colourRGB *glossy_col = (struct colourRGB *) malloc(sizeof(struct colourRGB));
-      int numGlossyRay = 5;
+      int numGlossyRay = 3;
       int i;
 
       struct point3D *reflect_ray_p0 = newPoint(p->px, p->py, p->pz, 1);
