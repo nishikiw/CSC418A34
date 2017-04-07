@@ -220,7 +220,6 @@ void planeIntersect(struct object3D *plane, struct ray3D *ray, double *lambda, s
 	
 	// Invalid intersection.
 	if (t < 0 || ray_transformed->d.pz == 0){
-		//printf("ERROR: PLANEINTERSECT - invalid intersection.\n");
 		t = -1;
 		memcpy(lambda, &t, sizeof(double));
 		return;
@@ -246,7 +245,6 @@ void planeIntersect(struct object3D *plane, struct ray3D *ray, double *lambda, s
     // TO DO for part4.
     // compute a b for texture mapping
     if (plane->texImg != NULL){
-      //printf("TODO Part4: intersection on texture\n");
       *a = (p->px+1.0)/2.0;
       *b = (p->py+1.0)/2.0;
       if (*a<0) *a=0;
@@ -294,13 +292,11 @@ void sphereIntersect(struct object3D *sphere, struct ray3D *ray, double *lambda,
 	B = 2 * dot(&ray_transformed->d, &ray_transformed->p0);
 	C = dot(&ray_transformed->p0, &ray_transformed->p0) - 1;
 	
-	// t2 >= t1
 	t1 = (-B - sqrt(B * B - 4 * A * C))/(2 * A);
 	t2 = (-B + sqrt(B * B - 4 * A * C))/(2 * A);
 	
 	if (t1 < 0){
 		if (t2 < 0){
-			//printf("ERROR: SPHEREINTERSECT - invalid intersection.\n");
 			t = -1;
 			memcpy(lambda, &t, sizeof(double));
 			return;
@@ -315,7 +311,6 @@ void sphereIntersect(struct object3D *sphere, struct ray3D *ray, double *lambda,
 
   // Invalid intersection.
   if (t < 0 || A == 0 || B * B - 4 * A * C < 0){
-    //printf("ERROR: SPHEREINTERSECT - invalid intersection.\n");
     t = -1;
     memcpy(lambda, &t, sizeof(double));
     return;
@@ -326,9 +321,7 @@ void sphereIntersect(struct object3D *sphere, struct ray3D *ray, double *lambda,
   // TO DO for part4.
   // compute a b for texture mapping
   if (sphere->texImg != NULL){
-    //printf("TODO Part4: intersection on texture\n");
     theta = acos(p->pz);
-    //phi = atan(p->py/p->px);
     if (p->px==0 && p->py>0) {
       phi = PI/2.0;
     }

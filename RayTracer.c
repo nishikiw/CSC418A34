@@ -84,14 +84,18 @@ void buildScene_a3(void)
  insertObject(o,&object_list);			// Insert into object list
 
  // Let's add a couple spheres
- o=newSphere(.05,.95,.35,.35,1,.25,.25,1,1,20, 0);
+ //o=newSphere(1,0,0,0,1,.25,.25,1,1,20, 0);				// Scene signature
+ //o=newSphere(.05,.95,.0,.35,1,.25,.25,1,1,20, 0);			// Only ambient and diffuse
+ o=newSphere(.05,.95,.35,.35,1,.25,.25,1,1,20, 0);			// All phong.
  Scale(o,.75,.5,1.5);
  RotateY(o,PI/2);
  Translate(o,-1.45,1.1,3.5);
  invert(&o->T[0][0],&o->Tinv[0][0]);
  insertObject(o,&object_list);
 
- o=newSphere(.05,.95,.95,.75,.75,.95,.55,1,1,20, 0);
+ //o=newSphere(1,0,0,0,.75,.95,.55,1,1,20, 0);				// Scene signature
+ //o=newSphere(.05,.95,.0,.75,.75,.95,.55,1,1,20, 0);		// Only ambient and diffuse
+ o=newSphere(.05,.95,.95,.75,.75,.95,.55,1,1,20, 0);		// All phong
  Scale(o,.5,2.0,1.0);
  RotateZ(o,PI/1.5);
  Translate(o,1.75,1.25,5.0);
@@ -719,6 +723,7 @@ int main(int argc, char *argv[])
  // Create a scene. This defines all the
 			// objects in the world of the raytracer
  buildScene_a4();
+ //buildScene_a3();
 
  //////////////////////////////////////////
  // TO DO: For Assignment 3 you can use the setup
