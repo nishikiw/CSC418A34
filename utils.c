@@ -405,26 +405,23 @@ void texMap(struct image *img, double a, double b, double *R, double *G, double 
  // coordinates. Your code should use bi-linear
  // interpolation to obtain the texture colour.
  //////////////////////////////////////////////////
-  // we use bi-linear interpolation to obtain the texture colour
-  int i, j;
-  double up, vp;
+  
+  int i, j; // coordinates in texture
+  double up, vp;  // the decimal part of a*img->sx, b*img->sy 
+                  //the u' and v' in lecture slide
   double *rgbIm;
 
-  //printf("start texmap\n");
-
   rgbIm=(double *)img->rgbdata;
-  //printf("rgbdata size=%d\n", (int) (sizeof(img->rgbdata)/sizeof(double)/3));
   i = floor(a*img->sx);
   j = floor(b*img->sy);
   up = a*img->sx - i;
   vp = b*img->sy - j;
 
-  //printf("a = %f, b = %f, i = %d, j = %d\n", a, b, i, j);
+  // bi-linear interpolation to obtain the texture colours
   *R = (1-up)*(1-vp)*rgbIm[(j*img->sx+i)*3] + \
        up*(1-vp)*rgbIm[((j+1)*img->sx+i)*3] + \
        (1-up)*vp*rgbIm[(j*img->sx+i+1)*3] + \
        up*vp*rgbIm[((j+1)*img->sx+i+1)*3];
-  //printf("c\n");
   *G = (1-up)*(1-vp)*rgbIm[(j*img->sx+i)*3 + 1] + \
        up*(1-vp)*rgbIm[((j+1)*img->sx+i)*3 +1] + \
        (1-up)*vp*rgbIm[(j*img->sx+i+1)*3 + 1] + \
@@ -434,11 +431,6 @@ void texMap(struct image *img, double a, double b, double *R, double *G, double 
        (1-up)*vp*rgbIm[(j*img->sx+i+1)*3 + 2] + \
        up*vp*rgbIm[((j+1)*img->sx+i+1)*3 + 2];
 
-  //printf("end texmap\n");
-
- // *(R)=0;	// Returns black - delete this and
- // *(G)=0;	// replace with your code to compute
- // *(B)=0;	// texture colour at (a,b)
  return;
 }
 
@@ -526,13 +518,13 @@ void addAreaLight(float sx, float sy, float nx, float ny, float nz,\
   up.pw=0;
 
 	normalize(&n);
-	// set up u and v
+	// setup u and v
 	u=cross(&n, &up);
 	normalize(u);
 	v=cross(u, &n);
 	normalize(v);
 
-	// Set up coordinate conversion matrices
+	// Setup coordinate conversion matrices
 	// Area2World matrix
 	A2W[0][0]=u->px;
 	A2W[1][0]=u->py;
@@ -554,6 +546,8 @@ void addAreaLight(float sx, float sy, float nx, float ny, float nz,\
 	A2W[2][3]=tz;
 	A2W[3][3]=1;
 
+  // inserts the area light source as an object 
+  //which is visible as a uniformly colored rectangle
   o=newPlane(0.05, 0, 0, 0, 0.9, 0.9, 0.9, 1, 1, 2, 0.5);
   o->isLightSource = 1;
   Scale(o, sx/2, sy/2, 1);
@@ -562,12 +556,13 @@ void addAreaLight(float sx, float sy, float nx, float ny, float nz,\
   insertObject(o, o_list);			// Insert into object list
 
   double du, dv;	// Increase along u and v directions for point light source coordinates
+  // only one light case
   if (lx==1 && ly==1) {
     p.px = 0;
     p.py = 0;
     p.pz = 0;
     p.pw = 1;
-    matVecMult(o->T, &p);
+    matVecMult(o->T, &p);  // convert to world coordinates
     l = newPLS(&p, r/(lx*ly), g/(lx*ly), b/(lx*ly));
     insertPLS(l, l_list);
     free(u);
@@ -575,6 +570,7 @@ void addAreaLight(float sx, float sy, float nx, float ny, float nz,\
     return;
   }
 
+  // only one row light source case
   if (lx>1 && ly==1) {
     du=2.0/(lx-1);
     for (i=0; i<lx; i++) {
@@ -591,6 +587,7 @@ void addAreaLight(float sx, float sy, float nx, float ny, float nz,\
     return;
   }
 
+  // only one column light source case
   if (lx==1 && ly>1) {
     dv=2.0/(ly-1);
     for (j=0; j<ly; j++) {
@@ -607,6 +604,7 @@ void addAreaLight(float sx, float sy, float nx, float ny, float nz,\
     return;
   }
 
+  // multi-row and multi-column light source
   if (lx>1 && ly>1) {
     du=2.0/(lx-1);   
     dv=2.0/(ly-1);

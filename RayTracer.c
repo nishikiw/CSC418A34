@@ -873,7 +873,7 @@ int main(int argc, char *argv[])
  ///////////////////////////////////////////////////
  //buildScene();		// Create a scene. This defines all the
 			// objects in the world of the raytracer
- buildSceneB();
+ buildScene();
 
  //////////////////////////////////////////
  // TO DO: For Assignment 3 you can use the setup
@@ -977,7 +977,7 @@ int main(int argc, char *argv[])
 				
 				d.px = pc.px-cam->e.px;
 				d.py = pc.py-cam->e.py;
-				d.pz = cam->f;
+				d.pz = cam->e.pz - cam->f;
 				d.pw = 0.0;
 				
 				matVecMult(cam->C2W, &pc);
