@@ -186,6 +186,7 @@ struct object3D *newSphere(double ra, double rd, double rs, double rg, double r,
   sphere->textureMap=&texMap;
   sphere->frontAndBack=0;
   sphere->isLightSource=0;
+  sphere->roughness = roughness;
  }
  return(sphere);
 }

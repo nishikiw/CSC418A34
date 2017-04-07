@@ -29,8 +29,95 @@ struct object3D *object_list;
 struct pointLS *light_list;
 int MAX_DEPTH;
 
-// the original scene of assignment
+
 void buildScene(void)
+{
+ // Sets up all objects in the scene. This involves creating each object,
+ // defining the transformations needed to shape and position it as
+ // desired, specifying the reflectance properties (albedos and colours)
+ // and setting up textures where needed.
+ // Light sources must be defined, positioned, and their colour defined.
+ // All objects must be inserted in the object_list. All light sources
+ // must be inserted in the light_list.
+ //
+ // To create hierarchical objects:
+ //   Copy the transform matrix from the parent node to the child, and
+ //   apply any required transformations afterwards.
+ //
+ // NOTE: After setting up the transformations for each object, don't
+ //       forget to set up the inverse transform matrix!
+
+ struct object3D *o;
+ struct pointLS *l;
+ struct point3D p;
+
+ ///////////////////////////////////////
+ // TO DO: For Assignment 3 you have to use
+ //        the simple scene provided
+ //        here, but for Assignment 4 you
+ //        *MUST* define your own scene.
+ //        Part of your mark will depend
+ //        on how nice a scene you
+ //        create. Use the simple scene
+ //        provided as a sample of how to
+ //        define and position objects.
+ ///////////////////////////////////////
+
+ // Simple scene for Assignment 3:
+ // Insert a couple of objects. A plane and two spheres
+ // with some transformations.
+
+ // Let's add a plane
+ // Note the parameters: ra, rd, rs, rg, R, G, B, alpha, r_index, and shinyness, roughness)
+ o=newPlane(.05,.75,.05,.05,.55,.8,.75,1,1,2, 0);	// Note the plane is highly-reflective (rs=rg=.75) so we
+						// should see some reflections if all is done properly.
+						// Colour is close to cyan, and currently the plane is
+						// completely opaque (alpha=1). The refraction index is
+						// meaningless since alpha=1
+ Scale(o,6,6,1);				// Do a few transforms...
+ RotateZ(o,PI/1.20);
+ RotateX(o,PI/2.25);
+ Translate(o,0,-3,10);
+ invert(&o->T[0][0],&o->Tinv[0][0]);		// Very important! compute
+						// and store the inverse
+						// transform for this object!
+ insertObject(o,&object_list);			// Insert into object list
+
+ // Let's add a couple spheres
+ o=newSphere(.05,.95,.35,.35,1,.25,.25,1,1,20, 0.1);
+ Scale(o,.75,.5,1.5);
+ RotateY(o,PI/2);
+ Translate(o,-1.45,1.1,3.5);
+ invert(&o->T[0][0],&o->Tinv[0][0]);
+ insertObject(o,&object_list);
+
+ o=newSphere(.05,.95,.95,.75,.75,.95,.55,1,1,20, 0.1);
+ Scale(o,.5,2.0,1.0);
+ RotateZ(o,PI/1.5);
+ Translate(o,1.75,1.25,5.0);
+ invert(&o->T[0][0],&o->Tinv[0][0]);
+ insertObject(o,&object_list);
+ 
+ // Insert a single point light source.
+ p.px=0;
+ p.py=15.5;
+ p.pz=-5.5;
+ p.pw=1;
+ l=newPLS(&p,.95,.95,.95);
+ insertPLS(l,&light_list);
+
+ // End of simple scene for Assignment 3
+ // Keep in mind that you can define new types of objects such as cylinders and parametric surfaces,
+ // or, you can create code to handle arbitrary triangles and then define objects as surface meshes.
+ //
+ // Remember: A lot of the quality of your scene will depend on how much care you have put into defining
+ //           the relflectance properties of your objects, and the number and type of light sources
+ //           in the scene.
+}
+
+
+// the original scene of assignment
+void buildSceneB(void)
 {
   // Sets up all objects in the scene. This involves creating each object,
   // defining the transformations needed to shape and position it as
@@ -68,138 +155,50 @@ void buildScene(void)
   // with some transformations.
 
   // Let's add a plane
-  // Note the parameters: ra, rd, rs, rg, R, G, B, alpha, r_index, and shinyness)
-  o=newPlane(.05,.75,.05,.05,.55,.8,.75,1,1,2, 0.5);	// Note the plane is highly-reflective (rs=rg=.75) so we
-  					// should see some reflections if all is done properly.
-  					// Colour is close to cyan, and currently the plane is
-  					// completely opaque (alpha=1). The refraction index is
-  					// meaningless since alpha=1
-  // for scene signature
-  // o=newPlane(1.0, 0.0, 0.0, 0.0,.55,.8,.75,1,1,2);
-  // for diffuse and ambient
-  // o=newPlane(.05,.75, 0.0, 0.0,.55,.8,.75,1,1,2);
+  // Note the parameters: ra, rd, rs, rg, R, G, B, alpha, r_index, and shinyness, roughness)
+   o=newPlane(.05,.75,.05,.05,.55,.8,.75,1,1,2, 0);	// Note the plane is highly-reflective (rs=rg=.75) so we
+						// should see some reflections if all is done properly.
+						// Colour is close to cyan, and currently the plane is
+						// completely opaque (alpha=1). The refraction index is
+						// meaningless since alpha=1
+ Scale(o,6,6,1);				// Do a few transforms...
+ RotateZ(o,PI/1.20);
+ RotateX(o,PI/2.25);
+ Translate(o,0,-3,10);
+ invert(&o->T[0][0],&o->Tinv[0][0]);		// Very important! compute
+						// and store the inverse
+						// transform for this object!
+ loadTexture(o, "./textures/plane_art2.ppm");
+ insertObject(o,&object_list);	
 
-  Scale(o,6,8,1);				// Do a few transforms...
-  //RotateZ(o,PI/1.20);
-  RotateX(o,-PI/1.85);
-  Translate(o,0,-3,10);
-  invert(&o->T[0][0],&o->Tinv[0][0]);		// Very important! compute
-  					// and store the inverse
-  					// transform for this object!
-  loadTexture(o, "./textures/plane_wood2.ppm");
-  insertObject(o,&object_list);			// Insert into object list
-
-  // Let's add a couple spheres
-  o=newSphere(.05,.95,.35,.35,1,.25,.25,1,1,6, 0.5);
-  // for scene signature
-  // o=newSphere(1.0, 0.0, 0.0, 0.0,1,.25,.25,1,1,50);
-  // for diffuse and ambient
-  //o=newSphere(.05,.95, 0.0, 0.0,1,.25,.25,1,1,50);
-  // for refraction
-  //o=newSphere(0,.7,0.9,.9,0.1,.1,.1,0.1,1.33,96);
-  //Scale(o,.75,.5,1.5);
-  //RotateY(o,PI/2);
-  //Translate(o,-1.45,1.1,3.5);
-  Translate(o,3.0,-1.5,10);
-  invert(&o->T[0][0],&o->Tinv[0][0]);
-  loadTexture(o, "./textures/sphere_cherryblossom.ppm");
-  insertObject(o,&object_list);
-
-  o=newSphere(.05,.95,.95,.15,.75,.95,.55,1,1, 6, 0.5);
-  //o=newSphere(.05,.95,.95,.75,.75,.95,.55,1,1,6);
-  // for signature
-  // o=newSphere(1.0, 0.0, 0.0, 0.0,.75,.95,.55,1,1,50);
-  // for ambient and signature
-  // o=newSphere(.05,.95, 0.0, 0.0,.75,.95,.55,1,1,50);
-  // for refraction
-  // o=newSphere(0,.7,0.9,.95,    0.95,.95,.95,    0.1,1.33,96, 0.5);
-  //Scale(o,0.5,0.5,0.5);
-  //RotateZ(o,PI/1.5);
-  //Translate(o,1.75,1.25,5.0);
-  Translate(o,-3.0,-1,5);
-  invert(&o->T[0][0],&o->Tinv[0][0]);
-  loadTexture(o, "./textures/sphere_pattern2.ppm");
-  insertObject(o,&object_list);
-
-  o=newSphere(0.4,.7,0.9,.95,    0.35,.35,.95,    0.8,1.2,96, 0.5);
-  Scale(o,0.5,0.5,0.5);
-  RotateZ(o,PI/1.5);
-  //Translate(o,1.75,1.25,5.0);
-  Translate(o,3.0,-2,5);
-  invert(&o->T[0][0],&o->Tinv[0][0]);
-  loadTexture(o, "./textures/sphere_pattern3.ppm");
-  insertObject(o,&object_list);
-
-  // build a native symbol
-  o=newSphere(0.4,.7,0.9, .25, 0.55,.55,.35, 0.8,1.2,96, 0.5);
-  Scale(o,0.5,0.3,0.5);
-  Translate(o,-1.0, -3.5, 5);
+  o=newSphere(0,.7,0.9,.95,0.1,.1,.1, 0.2,1.33,96, 0);
+  Scale(o,0.5,0.5,0.5);	
+  RotateY(o,PI/2);
+  Translate(o,2.2,-2.5,5);
   invert(&o->T[0][0],&o->Tinv[0][0]);
   insertObject(o,&object_list);
-
-  o=newSphere(0.4,.7,0.9, .25, 0.55,.55,.35, 0.8,1.2,96, 0.5);
-  Scale(o,0.5,0.3,0.5);
-  Translate(o, 1.0, -3.5, 5);
-  invert(&o->T[0][0],&o->Tinv[0][0]);
-  insertObject(o,&object_list);
-
-  o=newSphere(0.4,.7,0.9, .25, 0.55,.55,.55, 0.8,1.2,96, 0.5);
-  Scale(o,0.5,0.3,0.5);
-  Translate(o,-1.0, -2.9, 5);
-  invert(&o->T[0][0],&o->Tinv[0][0]);
-  insertObject(o,&object_list);
-
-  o=newSphere(0.4,.7,0.9, .25, 0.55,.55,.55, 0.8,1.2,96, 0.5);
-  Scale(o,0.5,0.3,0.5);
-  Translate(o, 1.0, -2.9, 5);
-  invert(&o->T[0][0],&o->Tinv[0][0]);
-  insertObject(o,&object_list);
-
-  o=newSphere(0.4,.7,0.9, .25, 0.55, .55, .55, 0.8,1.2,96, 0.5);
-  Scale(o,1.3, 0.5, 0.5);
-  Translate(o, 0.0, -2.1, 5);
-  invert(&o->T[0][0],&o->Tinv[0][0]);
-  loadTexture(o, "./textures/sphere_pattern2.ppm");
-  insertObject(o,&object_list);
-
-  o=newSphere(0.4,.7,0.9, .25, 0.35,.35,.35, 0.8,1.2,96, 0.5);
-  Scale(o, 0.7, 0.6, 0.5);
-  Translate(o, 0.0, -1.1, 5);
-  invert(&o->T[0][0],&o->Tinv[0][0]);
-  loadTexture(o, "./textures/sphere_pattern3.ppm");
-  insertObject(o,&object_list);
-
-  o=newSphere(0.4,.7,0.9, .25, 0.35,.35,.35, 0.8,1.2,96, 0.5);
-  Scale(o,1.9, 0.4, 0.4);
-  Translate(o, 0.0, -0.1, 5);
-  invert(&o->T[0][0],&o->Tinv[0][0]);
-  loadTexture(o, "./textures/sphere_cherryblossom.ppm");
-  insertObject(o,&object_list);
-
-  o=newSphere(0.4,.7,0.9, .25, 0.35,.35,.35, 0.8,1.2,96, 0.5);
-  Scale(o, 0.5, 0.6, 0.5);
-  Translate(o, 0.0, 0.8, 5);
-  invert(&o->T[0][0],&o->Tinv[0][0]);
-  loadTexture(o, "./textures/sphere_crystal.ppm");
-  insertObject(o,&object_list);
-
+ 
+  o=newSphere(.05,.95,.95,.75,.75,.95,.55,1,1,20, 0.1);
+ Translate(o,-2,-2,6.0);
+ invert(&o->T[0][0],&o->Tinv[0][0]);
+ loadTexture(o, "./textures/sphere_candy.ppm");
+ insertObject(o,&object_list);
+ 
+ o=newSphere(.05,.95,.95,.75,.75,.95,.55,0.7,1.3,20, 0);
+ Scale(o,0.8,0.8,0.8);
+ Translate(o,2,1,6);
+ invert(&o->T[0][0],&o->Tinv[0][0]);
+ loadTexture(o, "./textures/sphere_pattern3.ppm");
+ insertObject(o,&object_list);
   
-
-
-
-
-  // Insert a single point light source.
-  // p.px=0;
-  // p.py=15.5;
-  // p.pz=-5.5;
-  // p.pw=1;
-  // l=newPLS(&p,.95,.95,.95);
-  // insertPLS(l,&light_list);
-
   // add an area light source
-  addAreaLight(1.5, 1.5, 0.0, 1.0, 0.0,\
-                  0.5, 10.0, -5.0, 1, 1,\
-                  0.95, 0.95, 0.95, &object_list, &light_list);
+  addAreaLight(1, 1, 0.0, 1.0, 0.0,\
+                  0.5, 10.0, -5.0, 3, 3,\
+                  0.6, 0.6, 0.6, &object_list, &light_list);
+  
+  addAreaLight(1, 1, 0.0, 1.0, 0.0,\
+                  0, 10.0, -5.0, 3, 3,\
+                  0.6, 0.6, 0.6, &object_list, &light_list);
 
 
  // End of simple scene for Assignment 3
@@ -422,15 +421,42 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
       memcpy(&cur_shadow_ray->d, light_ray, sizeof(struct point3D));
       lambda = -1;
       findFirstHit(cur_shadow_ray, &lambda, obj, &findFirstHit_obj, first_hit_p, first_hit_n, &a, &b);
+	  double phong_alpha = 1;
+	  struct colourRGB transparent_obj_col;
+	  transparent_obj_col.R = 0;
+	  transparent_obj_col.G = 0;
+	  transparent_obj_col.B = 0;
+	  
+	  // The ratio is how the transparent object's color will affect on the phong illumination.
+	  double transparent_obj_col_ratio = 0.1;
+	  
+	  // If shader ray hit a transparent obj, continue fire shader ray and make phong illumination lighter based on phong_alpha;
+	  while (lambda > 0 && lambda < 1 && findFirstHit_obj->alpha < 1){
+		// Add color of transparent object to the final phone illumination.
+		transparent_obj_col.R += findFirstHit_obj->col.R * (1-findFirstHit_obj->alpha) * transparent_obj_col_ratio;
+		transparent_obj_col.G += findFirstHit_obj->col.G * (1-findFirstHit_obj->alpha) * transparent_obj_col_ratio;
+		transparent_obj_col.B += findFirstHit_obj->col.B * (1-findFirstHit_obj->alpha) * transparent_obj_col_ratio;
+		  
+		// Fire another shader ray from transparent obj to light source.
+	    phong_alpha = phong_alpha * (1 - findFirstHit_obj->alpha);
+		cur_shadow_ray->p0.px = first_hit_p->px - first_hit_n->px / pow(2, 20);
+		cur_shadow_ray->p0.py = first_hit_p->py - first_hit_n->py / pow(2, 20);
+		cur_shadow_ray->p0.pz = first_hit_p->pz - first_hit_n->pz / pow(2, 20);
+		cur_shadow_ray->d.px = cur_light->p0.px - cur_shadow_ray->p0.px;
+		cur_shadow_ray->d.py = cur_light->p0.py - cur_shadow_ray->p0.py;
+		cur_shadow_ray->d.pz = cur_light->p0.pz - cur_shadow_ray->p0.pz;
+		lambda = -1;
+		findFirstHit(cur_shadow_ray, &lambda, findFirstHit_obj, &findFirstHit_obj, first_hit_p, first_hit_n, &a, &b);
+	  }
       if (lambda > 0 && lambda < 1){
       tmp_col.R += obj->alb.ra * cur_light->col.R * R;
       tmp_col.G += obj->alb.ra * cur_light->col.G * G;
       tmp_col.B += obj->alb.ra * cur_light->col.B * B;
       } else {
       phongIllumination(cur_light, ray, cur_shadow_ray, obj, p, n, phong_col);
-      tmp_col.R += R * phong_col->R;
-      tmp_col.G += G * phong_col->G;
-      tmp_col.B += B * phong_col->B;
+      tmp_col.R += R * phong_col->R * phong_alpha + transparent_obj_col.R;
+      tmp_col.G += G * phong_col->G * phong_alpha + transparent_obj_col.G;
+      tmp_col.B += B * phong_col->B * phong_alpha + transparent_obj_col.B;
       }
       cur_light = cur_light->next;
       free(light_ray);
@@ -442,35 +468,13 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
 
     if (depth < MAX_DEPTH){
 
-      // // Single Reflection ray.
-      // struct point3D *reflect_ray_p0 = newPoint(p->px, p->py, p->pz, 1);
-      // struct point3D *offset_n = newPoint(n->px/pow(2, 20), n->py/pow(2, 20), n->pz/pow(2, 20), 0);
-      // addVectors(offset_n, reflect_ray_p0);
-      // struct point3D *reversed_ray_d = newPoint(-ray->d.px, -ray->d.py, -ray->d.pz, 0);
-      // double vn = dot(reversed_ray_d, n);
-      // struct point3D *reflect_ray_d = newPoint(2*vn*n->px - reversed_ray_d->px, 2*vn*n->py - reversed_ray_d->py, 2*vn*n->pz - reversed_ray_d->pz, 0.0);
-      // normalize(reflect_ray_d);
-      // struct ray3D *reflect_ray = newRay(reflect_ray_p0, reflect_ray_d);
-      // rayTrace(reflect_ray, depth+1, col, obj);
-      // free(reflect_ray_p0);
-      // free(reflect_ray_d);
-      // free(reflect_ray);
-      // free(reversed_ray_d);
-      // free(offset_n);
-      // // end of Single Reflection ray
-
-      // Glossy Reflection rays for A4
-      double theta, phi;
-      double x, y, z;
-      struct point3D *u, *v;
-      struct ray3D *glossy_ray;
-      struct point3D *glossy_ray_p0;
-      struct point3D *glossy_ray_d;
-      double A2W[4][4]; // Local to World conversion matrix 
-      struct colourRGB *glossy_col = (struct colourRGB *) malloc(sizeof(struct colourRGB));
-      int numGlossyRay = 3;
-      int i;
-
+      // Single Reflection ray.
+	/*
+	  struct colourRGB reflect_col;
+      reflect_col.R = 0;
+	  reflect_col.G = 0;
+	  reflect_col.B = 0;
+		
       struct point3D *reflect_ray_p0 = newPoint(p->px, p->py, p->pz, 1);
       struct point3D *offset_n = newPoint(n->px/pow(2, 20), n->py/pow(2, 20), n->pz/pow(2, 20), 0);
       addVectors(offset_n, reflect_ray_p0);
@@ -478,75 +482,119 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
       double vn = dot(reversed_ray_d, n);
       struct point3D *reflect_ray_d = newPoint(2*vn*n->px - reversed_ray_d->px, 2*vn*n->py - reversed_ray_d->py, 2*vn*n->pz - reversed_ray_d->pz, 0.0);
       normalize(reflect_ray_d);
-
-      u=cross(reflect_ray_d, n);
-      normalize(u);
-      v=cross(u, reflect_ray_d);
-      normalize(v);
-      // construct Area2World matrix
-      A2W[0][0]=u->px;
-      A2W[1][0]=u->py;
-      A2W[2][0]=u->pz;
-      A2W[3][0]=0;
-
-      A2W[0][1]=v->px;
-      A2W[1][1]=v->py;
-      A2W[2][1]=v->pz;
-      A2W[3][1]=0;
-
-      A2W[0][2]=reflect_ray_d->px;
-      A2W[1][2]=reflect_ray_d->py;
-      A2W[2][2]=reflect_ray_d->pz;
-      A2W[3][2]=0;
-
-      A2W[0][3]=reflect_ray_p0->px;
-      A2W[1][3]=reflect_ray_p0->py;
-      A2W[2][3]=reflect_ray_p0->pz;
-      A2W[3][3]=1;
-
-      for (i=0; i<numGlossyRay; i++) {
-        glossy_col->R = 0;
-        glossy_col->G = 0;
-        glossy_col->B = 0;
-        // Choose uniformly sampled random direction to send the ray
-        // theta = (PI/2)*random()*obj->roughness;
-        theta = (PI/2)*random();
-        phi = 2*PI*random();
-        x = sin(theta)*cos(phi);
-        y = sin(theta)*sin(phi);
-        z = cos(theta);
-
-        // ray direction in local coordinates
-        glossy_ray_d = newPoint(x, y, z, 0);  
-        // convert to global coordinates
-        matVecMult(A2W, glossy_ray_d);  
-        // check if the glossy_ray_d vector is below the surface
-        if (dot(glossy_ray_d, n) < 0) {
-          glossy_ray_d = newPoint(-x, -y, z, 0);
-        }
-        glossy_ray = newRay(reflect_ray_p0, reflect_ray_d);
-
-        rayTrace(glossy_ray, depth+1, glossy_col, obj);
-
-        col->R +=  glossy_col->R/numGlossyRay;
-        col->G +=  glossy_col->G/numGlossyRay;
-        col->B +=  glossy_col->B/numGlossyRay;
-      }
-
-      free(u);
-      free(v);
-      free(glossy_ray);
-      free(glossy_ray_p0);
-      free(glossy_ray_d);
-      free(glossy_col);
-      
+      struct ray3D *reflect_ray = newRay(reflect_ray_p0, reflect_ray_d);
+      rayTrace(reflect_ray, depth+1, &reflect_col, obj);
+	  
+	  col->R = col->R + reflect_col.R * obj->alpha;
+	  col->G = col->G + reflect_col.G * obj->alpha;
+	  col->B = col->B + reflect_col.B * obj->alpha;
+	  
       free(reflect_ray_p0);
       free(reflect_ray_d);
+      free(reflect_ray);
       free(reversed_ray_d);
       free(offset_n);
-      // end of Glossy Reflection rays
+	  
+      // end of Single Reflection ray
+      
+		*/
+	  
+	  struct point3D *u;
+	  struct point3D *v;
+	  double theta, phi, x, y, z;
+	  struct point3D *glossy_reflect_ray_d;
+	  struct ray3D *reflect_ray;
+	  int num_reflect_rays;
+		
+	  if (obj->roughness == 0){
+		num_reflect_rays = 1;
+	  }
+	  else{
+		num_reflect_rays = 10;
+	}
+	  
+	  double avg_R = 0;
+	  double avg_G = 0;
+	  double avg_B = 0;
+	  
+	  struct colourRGB reflect_col;
+			
+	  struct point3D *reflect_ray_p0 = newPoint(p->px, p->py, p->pz, 1);
+	  struct point3D *offset_n = newPoint(n->px/pow(2, 20), n->py/pow(2, 20), n->pz/pow(2, 20), 0);
+	  addVectors(offset_n, reflect_ray_p0);
+	  struct point3D *reversed_ray_d = newPoint(-ray->d.px, -ray->d.py, -ray->d.pz, 0);
+	  double vn = dot(reversed_ray_d, n);
+	  struct point3D *reflect_ray_d = newPoint(2*vn*n->px - reversed_ray_d->px, 2*vn*n->py - reversed_ray_d->py, 2*vn*n->pz - reversed_ray_d->pz, 0.0);
+	  normalize(reflect_ray_d);
+		
+	  for (int i = 0; i < num_reflect_rays; i++){
+		reflect_col.R = 0;
+	    reflect_col.G = 0;
+	    reflect_col.B = 0;
+		
+		u = cross(reflect_ray_d, n);
+		v = cross(reflect_ray_d, u);
+		
+		theta = 2 * PI * rand() * obj->roughness / RAND_MAX ;
+		phi = 2 * PI * rand() * obj->roughness / RAND_MAX;
+		
+		x = sin(theta) * cos(phi);
+		y = sin(theta) * sin(phi);
+		z = cos(theta);
+		
+		glossy_reflect_ray_d = newPoint(
+			x * u->px + y * v->px + z * reflect_ray_d->px, 
+			x * u->py + y * v->py + z * reflect_ray_d->py,
+			x * u->pz + y * v->pz + z * reflect_ray_d->pz,
+			0
+   		);
+		
+		normalize(glossy_reflect_ray_d);
+		
+		while (round(dot(reflect_ray_d, n)) < 0){
+			// Only fire ray that has 90 degree angle with normal.
+			theta = 2 * PI * rand() * obj->roughness / RAND_MAX ;
+			phi = 2 * PI * rand() * obj->roughness / RAND_MAX;
+			
+			x = sin(theta) * cos(phi);
+			y = sin(theta) * sin(phi);
+			z = cos(theta);
+			
+			glossy_reflect_ray_d = newPoint(
+				x * u->px + y * v->px + z * reflect_ray_d->px, 
+				x * u->py + y * v->py + z * reflect_ray_d->py,
+				x * u->pz + y * v->pz + z * reflect_ray_d->pz,
+				0
+			);
+			
+			normalize(glossy_reflect_ray_d);
+		}
+		
+		reflect_ray = newRay(reflect_ray_p0, glossy_reflect_ray_d);
+		rayTrace(reflect_ray, depth+1, &reflect_col, obj);
+	  
+		avg_R += reflect_col.R;
+		avg_G += reflect_col.G;
+		avg_B += reflect_col.B;
+	  }
+	  
+	  avg_R = avg_R / num_reflect_rays;
+	  avg_G = avg_G / num_reflect_rays;
+	  avg_B = avg_B / num_reflect_rays;
+	  
+	  col->R = col->R + avg_R * obj->alpha;
+	  col->G = col->G + avg_G * obj->alpha;
+      col->B = col->B + avg_B * obj->alpha;
+	  
+      free(reflect_ray_p0);
+      free(reflect_ray_d);
+      free(reflect_ray);
+      free(reversed_ray_d);
+      free(offset_n);
+	  free(u);
+	  free(v);
+	  free(glossy_reflect_ray_d);
 
-   
       // Refraction ray for A4
       if (obj->alpha < 1){
         struct colourRGB refract_col;
@@ -617,8 +665,6 @@ void getRefractionVector(double nt, double n, struct point3D *d, struct point3D 
 	normalize(d);
 	normalize(normal);
 	
-	//printf("\nnt = %f, n = %f, d = (%f, %f, %f), normal = (%f, %f, %f)\n", nt, n, d->px, d->py, d->pz, normal->px, normal->py, normal->pz);
-	
 	t->px = d->px;
 	t->py = d->py;
 	t->pz = d->pz;
@@ -641,8 +687,6 @@ void getRefractionVector(double nt, double n, struct point3D *d, struct point3D 
 	
 	free(n_times_d_dot_n);
 	free(vec2);
-	
-	//printf("t = (%f, %f, %f)\n----------------------------------\n", t->px, t->py, t->pz);
 	
 	return;
 }
@@ -760,9 +804,6 @@ void rayTrace(struct ray3D *ray, int depth, struct colourRGB *col, struct object
 
  if (depth>MAX_DEPTH)	// Max recursion depth reached. Return invalid colour.
  {
-  // col->R=-1;
-  // col->G=-1;
-  // col->B=-1;
   return;
  }
 
@@ -783,8 +824,9 @@ void rayTrace(struct ray3D *ray, int depth, struct colourRGB *col, struct object
   // evaluate shading mode and get the colour
   if (obj!=Os) {
     rtShade(obj, &p, &n, ray, depth, a, b, &I);
-
+	
     if (Os!=NULL) {
+	  // rg is used as the relection factor.
       col->R += Os->alb.rg*I.R;
       col->G += Os->alb.rg*I.G;
       col->B += Os->alb.rg*I.B;
@@ -792,7 +834,7 @@ void rayTrace(struct ray3D *ray, int depth, struct colourRGB *col, struct object
       col->R += I.R;
       col->G += I.G;
       col->B += I.B;
-    } 
+    }
   }
 
   return;
@@ -843,7 +885,7 @@ int main(int argc, char *argv[])
 
  object_list=NULL;
  light_list=NULL;
-
+ 
  // Allocate memory for the new image
  im=newImage(sx, sx);
  if (!im)
@@ -860,9 +902,9 @@ int main(int argc, char *argv[])
  //        for Assignment 4 you need to create your own
  //        *interesting* scene.
  ///////////////////////////////////////////////////
- buildScene();		// Create a scene. This defines all the
+ //buildScene();		// Create a scene. This defines all the
 			// objects in the world of the raytracer
- //buildSceneA();
+ buildSceneB();
 
  //////////////////////////////////////////
  // TO DO: For Assignment 3 you can use the setup
@@ -878,7 +920,7 @@ int main(int argc, char *argv[])
 
  // Camera center is at (0,0,-1)
  e.px=0;
- e.py=0;
+ e.py=1;
  e.pz=-1;
  e.pw=1;
 
@@ -912,9 +954,9 @@ int main(int argc, char *argv[])
  }
 
  // Set up background colour here
- background.R=0.01;
- background.G=0.01;
- background.B=0.01;
+ background.R=0.47/2;
+ background.G=0.41/2;
+ background.B=0.36/2;
 
  // Do the raytracing
  //////////////////////////////////////////////////////
@@ -961,12 +1003,12 @@ int main(int argc, char *argv[])
 			for (int iter_h = 0; iter_h < n; iter_h++){ 
 				pc.px = cam->wl + i*du + iter_h*sub_du + rand()/(RAND_MAX/sub_du);
 				pc.py = cam->wt + j*dv + iter_v*sub_dv + rand()/(RAND_MAX/sub_dv);
-				pc.pz = cam->f;
+				pc.pz = cam->e.pz - cam->f;
 				pc.pw = 1.0;
 				
 				d.px = pc.px-cam->e.px;
 				d.py = pc.py-cam->e.py;
-				d.pz = pc.pz-cam->e.pz;
+				d.pz = cam->f;
 				d.pw = 0.0;
 				
 				matVecMult(cam->C2W, &pc);
@@ -1025,13 +1067,13 @@ int main(int argc, char *argv[])
 		rayTrace(ray, 0, &col, NULL);
 		free(ray);
 	}
-    
+	
     if (col.R <= 0) {
       rgbIm[(j*sx + i)*3] = background.R * 255;
       rgbIm[(j*sx + i)*3 + 1] = background.G * 255;
       rgbIm[(j*sx + i)*3 + 2] = background.B * 255;
     } 
-    else {
+    else { 
 	  if (col.R > 1){
 		rgbIm[(j*sx + i)*3] = 255;
 	  }
