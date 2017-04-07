@@ -508,16 +508,16 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
         glossy_col->R = 0;
         glossy_col->G = 0;
         glossy_col->B = 0;
+
         // Choose uniformly sampled random direction to send the ray
-        // theta = (PI/2)*random()*obj->roughness;
-        theta = (PI/2)*random();
-        phi = 2*PI*random();
+        theta = (PI/2)*obj->roughness*((double) rand() / (RAND_MAX));
+        phi = 2*PI*((double) rand() / (RAND_MAX));
         x = sin(theta)*cos(phi);
         y = sin(theta)*sin(phi);
         z = cos(theta);
 
         // ray direction in local coordinates
-        glossy_ray_d = newPoint(x, y, z, 0);  
+        glossy_ray_d = newPoint(x, y, z, 0); 
         // convert to global coordinates
         matVecMult(A2W, glossy_ray_d);  
         // check if the glossy_ray_d vector is below the surface
@@ -546,7 +546,6 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
       free(offset_n);
       // end of Glossy Reflection rays
 
-   
       // Refraction ray for A4
       if (obj->alpha < 1){
         struct colourRGB refract_col;
@@ -569,7 +568,7 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
       		printf("Refraction ray lambda < 0\n");
       		exit(0);
       	}
-  	
+	
         // Add offset to out refraction ray p0
         out_p->px = out_p->px + out_n->px/pow(2, 20);
         out_p->py = out_p->py + out_n->py/pow(2, 20);
