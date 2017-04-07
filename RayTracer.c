@@ -822,7 +822,7 @@ int main(int argc, char *argv[])
 				
 				d.px = pc.px-cam->e.px;
 				d.py = pc.py-cam->e.py;
-				d.pz = cam->e.pz - cam->f;
+				d.pz = cam->f;
 				d.pw = 0.0;
 				
 				matVecMult(cam->C2W, &pc);
