@@ -162,7 +162,7 @@ void buildScene_a4(void)
   // This is the sphere used for comparison. It is semi-transparent so you could see the 
   // color of this sphere influence the shadow. It has clear reflection so you could see
   // the difference comparing with the sphere with glossy reflection.
-  o=newSphere(.05,.95,.95,.75,.75,.95,.55,0.7,1.3,20, 0);
+  o=newSphere(.05,.95,.95,.75,.75,.95,.55,1,1,20, 0);
   Scale(o,0.8,0.8,0.8);
   Translate(o,2,1,6);
   invert(&o->T[0][0],&o->Tinv[0][0]);
@@ -170,13 +170,9 @@ void buildScene_a4(void)
   insertObject(o,&object_list);
   
   // add an area light source
-  addAreaLight(1, 1, 0.0, 1.0, 0.0,\
+  addAreaLight(1., 1., 0.0, 1.0, 0.0,\
                   0.5, 10.0, -5.0, 5, 5,\
-                  0.6, 0.6, 0.6, &object_list, &light_list);
-  
-  addAreaLight(1, 1, 0.0, 1.0, 0.0,\
-                  0, 10.0, -5.0, 5, 5,\
-                  0.6, 0.6, 0.6, &object_list, &light_list);
+                  1., 1., 1., &object_list, &light_list);
 }
 
 void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct ray3D *ray, int depth, double a, double b, struct colourRGB *col)
@@ -261,9 +257,9 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
 	  // If shader ray hit a transparent obj, continue fire shader ray and make phong illumination lighter based on phong_alpha;
 	  while (lambda > 0 && lambda < 1 && findFirstHit_obj->alpha < 1){
 		// Add color of transparent object to the final phone illumination.
-		transparent_obj_col.R += findFirstHit_obj->col.R * (1-findFirstHit_obj->alpha) * transparent_obj_col_ratio;
-		transparent_obj_col.G += findFirstHit_obj->col.G * (1-findFirstHit_obj->alpha) * transparent_obj_col_ratio;
-		transparent_obj_col.B += findFirstHit_obj->col.B * (1-findFirstHit_obj->alpha) * transparent_obj_col_ratio;
+		//transparent_obj_col.R += findFirstHit_obj->col.R * (1-findFirstHit_obj->alpha);
+		//transparent_obj_col.G += findFirstHit_obj->col.G * (1-findFirstHit_obj->alpha);
+		//transparent_obj_col.B += findFirstHit_obj->col.B * (1-findFirstHit_obj->alpha);
 		  
 		// Fire another shader ray from transparent obj to light source.
 	    phong_alpha = phong_alpha * (1 - findFirstHit_obj->alpha);
@@ -285,9 +281,9 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
       } else {
 		// Finally the shadow ray reaches the light.
 		phongIllumination(cur_light, ray, cur_shadow_ray, obj, p, n, phong_col);
-		tmp_col.R += R * phong_col->R * phong_alpha + transparent_obj_col.R;
-		tmp_col.G += G * phong_col->G * phong_alpha + transparent_obj_col.G;
-		tmp_col.B += B * phong_col->B * phong_alpha + transparent_obj_col.B;
+		tmp_col.R += R * phong_col->R * phong_alpha;
+		tmp_col.G += G * phong_col->G * phong_alpha;
+		tmp_col.B += B * phong_col->B * phong_alpha;
       }
       cur_light = cur_light->next;
       free(light_ray);

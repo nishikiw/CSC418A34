@@ -1,0 +1,36 @@
+- What was the process you used to complete the assignment. That is, how did you organize
+  your work, go about understanding the starter code, and build a solution.
+  
+  We splitted the work based on features. We used the concept from lecture 8 and ray tracing tutorials
+  to implement the features.
+  
+- Brief description of the code you implemented and how it works. Particularly if you did anything 
+  that is not straightforward to understand by looking at your code.
+  
+  Soft shadow, glossy reflection, and anti-aliasing are implemented based on the psudocode from tutorial slides.
+  Texture mapping and refraction are implemented based on the formula we learned in lecture 7 and 8.
+
+- What parts of the assignment were easy/hard.
+
+  The hardest part of this assignment is to render scene. Too many memory allocation could cause segmentation fault.
+
+- Whether the assignment helped you understand better the following topics:
+  - Geometry (points, vectors, planes, spheres, intersections, normals, etc.)
+	YES.
+  - Object transformations
+	YES.
+  - Projection and coordinate frames
+	YES.
+  - Illumination (the Phong model, basically)
+	YES.
+  
+- The role of each member on the project:
+Yijin Wang: Refraction, anti-aliasing
+Wei Jun Zeng: Soft shadow, texture mapping
+Together: glossy reflection
+(Both members were involved in debugging.)
+
+- Note:
+	- We couldn't render anti-aliasing for our final scene due to not enough memory.
+	Therefore, we decided to have the final scene without anti-aliasing, and another image
+	especially shows anti-aliasing effect.
