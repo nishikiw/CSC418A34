@@ -467,37 +467,6 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
     col->B = tmp_col.B;
 
     if (depth < MAX_DEPTH){
-
-      // Single Reflection ray.
-	/*
-	  struct colourRGB reflect_col;
-      reflect_col.R = 0;
-	  reflect_col.G = 0;
-	  reflect_col.B = 0;
-		
-      struct point3D *reflect_ray_p0 = newPoint(p->px, p->py, p->pz, 1);
-      struct point3D *offset_n = newPoint(n->px/pow(2, 20), n->py/pow(2, 20), n->pz/pow(2, 20), 0);
-      addVectors(offset_n, reflect_ray_p0);
-      struct point3D *reversed_ray_d = newPoint(-ray->d.px, -ray->d.py, -ray->d.pz, 0);
-      double vn = dot(reversed_ray_d, n);
-      struct point3D *reflect_ray_d = newPoint(2*vn*n->px - reversed_ray_d->px, 2*vn*n->py - reversed_ray_d->py, 2*vn*n->pz - reversed_ray_d->pz, 0.0);
-      normalize(reflect_ray_d);
-      struct ray3D *reflect_ray = newRay(reflect_ray_p0, reflect_ray_d);
-      rayTrace(reflect_ray, depth+1, &reflect_col, obj);
-	  
-	  col->R = col->R + reflect_col.R * obj->alpha;
-	  col->G = col->G + reflect_col.G * obj->alpha;
-	  col->B = col->B + reflect_col.B * obj->alpha;
-	  
-      free(reflect_ray_p0);
-      free(reflect_ray_d);
-      free(reflect_ray);
-      free(reversed_ray_d);
-      free(offset_n);
-	  
-      // end of Single Reflection ray
-      
-		*/
 	  
 	  struct point3D *u;
 	  struct point3D *v;
@@ -511,7 +480,7 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
 	  }
 	  else{
 		num_reflect_rays = 10;
-	}
+	  }
 	  
 	  double avg_R = 0;
 	  double avg_G = 0;
@@ -617,7 +586,7 @@ void rtShade(struct object3D *obj, struct point3D *p, struct point3D *n, struct 
       		printf("Refraction ray lambda < 0\n");
       		exit(0);
       	}
-  	
+	
         // Add offset to out refraction ray p0
         out_p->px = out_p->px + out_n->px/pow(2, 20);
         out_p->py = out_p->py + out_n->py/pow(2, 20);
